@@ -150,6 +150,33 @@ export default function Shop() {
         </div>
       )}
 
+      {/* Bedroom Special Showcase Banner (Featured when viewing Bedroom) */}
+      {cat === 'Bedroom' && (
+        <div className="relative rounded-3xl overflow-hidden mb-10 h-64 sm:h-80 shadow-md border border-[#EFE8DC]">
+          <img
+            src="/images/bedroom-banner.jpg"
+            alt="Forma Bedroom Collection"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-transparent flex flex-col justify-center p-6 sm:p-12 text-white">
+            <span className="text-xs font-bold tracking-[0.25em] text-[#F2DFCE] uppercase mb-2">
+              Serene Sleep Sanctuary
+            </span>
+            <h2 className="font-sans font-bold text-3xl sm:text-4xl text-white max-w-lg leading-tight">
+              Bedroom Collection
+            </h2>
+            <p className="mt-2 text-xs sm:text-sm text-[#E7DFD4] max-w-md leading-relaxed">
+              Discover 15 tranquil solid oak platform beds, Belgian linen upholstered headboards, fluted nightstands, and artisan dressers crafted for restful living.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2 text-[11px]">
+              <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/25">15 Unique Pieces</span>
+              <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/25">Solid European Oak</span>
+              <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/25">Hypoallergenic Materials</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Category Pills Slider */}
       <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-6 scrollbar-none">
         <button
