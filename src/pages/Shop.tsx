@@ -285,6 +285,33 @@ export default function Shop() {
         </div>
       )}
 
+      {/* Storage Special Showcase Banner (Featured when viewing Storage) */}
+      {cat === 'Storage' && (
+        <div className="relative rounded-3xl overflow-hidden mb-10 h-64 sm:h-80 shadow-md border border-[#EFE8DC]">
+          <img
+            src="/images/storage-banner.jpg"
+            alt="Forma Storage Collection"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-transparent flex flex-col justify-center p-6 sm:p-12 text-white">
+            <span className="text-xs font-bold tracking-[0.25em] text-[#F2DFCE] uppercase mb-2">
+              Organized Simplicity
+            </span>
+            <h2 className="font-sans font-bold text-3xl sm:text-4xl text-white max-w-lg leading-tight">
+              Storage Collection
+            </h2>
+            <p className="mt-2 text-xs sm:text-sm text-[#E7DFD4] max-w-md leading-relaxed">
+              Declutter gracefully with 16 architectural cane sideboards, fluted lowline credenzas, modular open bookcases, and entryway organizers.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2 text-[11px]">
+              <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/25">16 Unique Pieces</span>
+              <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/25">Solid Oak &amp; Cane</span>
+              <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/25">Modular Versatility</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Category Pills Slider */}
       <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-6 scrollbar-none">
         <button
