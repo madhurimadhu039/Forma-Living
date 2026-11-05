@@ -111,7 +111,7 @@ export const products: Product[] = [
   p('elena-vanity-desk', 'Elena Fluted Bedroom Vanity Desk', 'Bedroom', 'Contemporary Luxury', 'Natural Oak & Brass', 'Solid White Oak & Marble', 379, 110, 50, 78, 5, 449, false, 'Chic bedroom dressing table and study desk featuring fluted drawer detailing, concealed jewelry organizer, and brass accents.'),
 
   // ─── DINING ROOM COLLECTION (EXPANDED WITH DISTINCT IMAGES) ─────────────────────────
-  p('wooden-table', 'Wooden Dining Table', 'Dining Room', 'Minimalist', 'Natural Oak', 'Solid Oak', 199, 120, 70, 48, 6, 249, true, 'Hand-finished solid oak dining and accent table featuring smooth rounded edges and sturdy tapered legs.'),
+  p('wooden-table', 'Wooden Dining Table', 'Dining Room', 'Minimalist', 'Natural Oak', 'Solid Oak', 299, 160, 85, 76, 6, 359, true, 'Hand-finished solid European oak dining table featuring smooth rounded perimeter edges, natural oiled grain, and sturdy tapered timber legs.'),
   p('alma-table', 'Alma Dining Table', 'Dining Room', 'Modern', 'Walnut', 'American Walnut', 429, 160, 90, 76, 4, 499, false, 'Statement dining table crafted with rich grain American walnut veneer and beveled perimeter.'),
   p('kyoto-round-dining-table', 'Kyoto Round Pedestal Table', 'Dining Room', 'Japandi', 'Natural Muted Oak', 'Solid White Oak', 469, 120, 120, 76, 5, 549, true, 'Sculptural circular dining table featuring a bold fluted column base and beveled reverse bullnose perimeter.'),
   p('verona-marble-dining-table', 'Verona Oval Marble Dining Table', 'Dining Room', 'Contemporary Luxury', 'Calacatta & Walnut', 'Calacatta Marble & Walnut', 899, 210, 105, 76, 2, 1099, false, 'Showcase oval dining table featuring a honed Italian Calacatta marble slab seated on twin contoured walnut pedestals.'),
