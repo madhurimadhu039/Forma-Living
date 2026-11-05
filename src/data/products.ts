@@ -13,6 +13,7 @@ export interface Product {
   height: number
   description: string
   image: string
+  images?: string[]
   isPopular?: boolean
 }
 
@@ -50,7 +51,8 @@ const p = (
   stock = 10,
   compareAt?: number,
   isPopular = false,
-  description?: string
+  description?: string,
+  images?: string[]
 ): Product => ({
   id,
   name,
@@ -65,20 +67,35 @@ const p = (
   depth,
   height,
   image: `/images/${id}.jpg`,
-  description: description || `${name}: crafted from premium ${material.toLowerCase()} in a refined ${style} aesthetic. Designed for durability, comfort, and timeless beauty.`,
+  images: images || [`/images/${id}.jpg`],
+  description:
+    description ||
+    `${name}: crafted from premium ${material.toLowerCase()} in a refined ${style} aesthetic. Designed for durability, comfort, and timeless beauty.`,
   isPopular
 })
 
 export const products: Product[] = [
-  // 4 Featured Popular Products from Reference Design
+  // ─── LIVING ROOM COLLECTION (EXPANDED WITH DISTINCT IMAGES) ─────────────────────────
   p('cozy-armchair', 'Cozy Armchair', 'Living Room', 'Modern', 'Beige', 'Boucle & Oak', 249, 82, 85, 78, 8, 299, true, 'An inviting modern armchair upholstered in soft textured boucle with sculpted natural oak legs.'),
   p('modern-sofa', 'Modern Sofa', 'Living Room', 'Contemporary', 'Cream', 'Linen Blend', 599, 210, 92, 82, 4, 699, true, 'Sleek two-seater sofa with deep cushioning, clean lines, and neutral stain-resistant linen upholstery.'),
-  p('wooden-table', 'Wooden Table', 'Dining Room', 'Minimalist', 'Natural Oak', 'Solid Oak', 199, 120, 70, 48, 6, 249, true, 'Hand-finished solid oak coffee and accent table featuring smooth rounded edges and sturdy tapered legs.'),
-  p('stylish-lamp', 'Stylish Lamp', 'Lighting', 'Modern', 'Mustard & Ceramic', 'Ceramic & Brass', 89, 28, 28, 42, 15, 119, true, 'Architectural mushroom dome table lamp with a warm mustard glazed dome and speckled ceramic pedestal base.'),
-
-  // Additional curated store products with distinct categories and images
   p('luca-chair', 'Luca Lounge Chair', 'Living Room', 'Japandi', 'Sand Beige', 'Solid Ash & Linen', 349, 78, 82, 76, 5, 399, false, 'Japanese-Scandinavian lounge chair with low-profile silhouette and tailored linen cushioning.'),
   p('soren-sofa', 'Soren 3-Seater Sofa', 'Living Room', 'Scandinavian', 'Warm Ivory', 'Textured Boucle', 699, 230, 95, 80, 3, 799, false, 'Grand three-seater lounge sofa with organic curved contouring and plush feather-blend cushions.'),
+  p('kyoto-coffee-table', 'Kyoto Fluted Coffee Table', 'Living Room', 'Japandi', 'Natural Oak', 'Solid White Oak', 299, 90, 90, 42, 6, 349, false, 'Sculptural circular coffee table featuring handcrafted tambour fluted pedestal base and organic bullnose edge profile.'),
+  p('nordic-recliner', 'Nordic Swivel Lounge Chair', 'Living Room', 'Scandinavian Modern', 'Warm Caramel', 'Top-Grain Leather & Steel', 389, 82, 85, 88, 5, 449, false, 'Ergonomic 360-degree swivel lounge chair tailored in supple top-grain leather on an architectural matte black steel base.'),
+  p('haven-sectional', 'Haven Modular Corner Sofa', 'Living Room', 'Modern Minimalist', 'Oatmeal', 'Performance Linen Blend', 899, 280, 165, 82, 2, 1099, false, 'Generously proportioned modular corner sectional with deep foam-feather seats and spill-resistant relaxed linen upholstery.'),
+  p('verona-side-table', 'Verona Travertine Side Table', 'Living Room', 'Contemporary Luxury', 'Warm Alabaster', 'Honed Roman Travertine', 179, 45, 45, 52, 9, 219, false, 'Solid natural Roman travertine end table cut with architectural pill-shaped pedestal and velvet soft honed matte finish.'),
+  p('marfa-chaise', 'Marfa Velvet Chaise Lounge', 'Living Room', 'Mid-Century Modern', 'Olive Ochre', 'Mohair Velvet & Brass', 459, 175, 85, 78, 3, 529, false, 'Tailored daybed and reading chaise crafted with high-density foam core, subtle channel tufting, and brass capped walnut legs.'),
+  p('oslo-credenza', 'Oslo Low Oak Media Console', 'Living Room', 'Scandinavian', 'Bleached Oak', 'Solid White Oak & Cane', 419, 180, 42, 54, 4, 499, false, 'Low-slung entertainment sideboard with acoustic cane weave sliding tambour doors and discrete rear cable passages.'),
+  p('boucle-pouf', 'Terrazzo & Boucle Round Ottoman', 'Living Room', 'Modern Organic', 'Cream White', 'Textured Boucle & Foam', 129, 55, 55, 44, 12, 159, false, 'Multi-functional accent footstool and impromptu seating piece wrapped in tactile nubby boucle with weighted non-slip base.'),
+  p('solis-accent-chair', 'Solis Sculptural Accent Chair', 'Living Room', 'Japandi Modern', 'Sand & Natural Wood', 'Bent Ash Wood & Wool', 319, 74, 76, 75, 7, 379, false, 'Artful statement chair pairing fluid bentwood ash geometry with a thick upholstered wool-blend floating seat cushion.'),
+  p('arura-bookshelf', 'Arura Low Display Shelf', 'Living Room', 'Industrial Modern', 'Smoked Walnut', 'Smoked Oak & Iron', 349, 140, 36, 85, 5, 419, false, 'Low architectural open display shelving unit designed for curated art books, ceramics, and ambient lighting accents.'),
+  p('velvet-accent-chair', 'Clara Barrel Armchair', 'Living Room', 'Modern Classic', 'Forest Green', 'Textured Velvet & Beech', 289, 78, 80, 82, 6, 339, false, 'Gracefully curved accent armchair with wrap-around barrel back support, high-resilience foam, and tapered hardwood legs.'),
+  p('tokyo-media-unit', 'Tokyo Fluted Lowboard', 'Living Room', 'Japandi Minimalist', 'Charcoal Ash', 'Charcoal Oak & Brass', 479, 195, 45, 50, 3, 569, false, 'Expansive contemporary media console with ribbed tambour sliding doors and soft-close storage compartments.'),
+  p('fluted-wood-table', 'Forma Minimalist Nesting Tables', 'Living Room', 'Modern Organic', 'Light Blonde Wood', 'Solid Ash Wood', 189, 70, 70, 46, 8, 229, false, 'Set of two organic circular nesting coffee tables designed to tuck together or separate across living room seating areas.'),
+
+  // ─── OTHER ROOM CATEGORIES ───────────────────────────────────────────────────────────
+  p('wooden-table', 'Wooden Dining Table', 'Dining Room', 'Minimalist', 'Natural Oak', 'Solid Oak', 199, 120, 70, 48, 6, 249, true, 'Hand-finished solid oak dining and accent table featuring smooth rounded edges and sturdy tapered legs.'),
+  p('stylish-lamp', 'Stylish Dome Lamp', 'Lighting', 'Modern', 'Mustard & Ceramic', 'Ceramic & Brass', 89, 28, 28, 42, 15, 119, true, 'Architectural mushroom dome table lamp with a warm mustard glazed dome and speckled ceramic pedestal base.'),
   p('alma-table', 'Alma Dining Table', 'Dining Room', 'Modern', 'Walnut', 'American Walnut', 429, 160, 90, 76, 4, 499, false, 'Statement dining table crafted with rich grain American walnut veneer and beveled perimeter.'),
   p('rae-pendant', 'Rae Pendant Light', 'Lighting', 'Contemporary', 'Brushed Brass', 'Spun Brass & Glass', 119, 35, 35, 40, 20, 149, false, 'Modern sculptural pendant with hand-brushed brass finish and diffused warm illumination.'),
   p('noor-bed', 'Noor Platform Bed', 'Bedroom', 'Minimalist', 'Natural Oak', 'Solid European Oak', 549, 180, 215, 95, 4, 649, false, 'Minimalist solid oak platform bed with floating aesthetic and integrated headboard ledge.'),

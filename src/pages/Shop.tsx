@@ -123,6 +123,33 @@ export default function Shop() {
         </p>
       </div>
 
+      {/* Living Room Special Showcase Banner (Featured when viewing Living Room) */}
+      {cat === 'Living Room' && (
+        <div className="relative rounded-3xl overflow-hidden mb-10 h-64 sm:h-80 shadow-md border border-[#EFE8DC]">
+          <img
+            src="/images/living-room-banner.jpg"
+            alt="Forma Living Room Collection"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-transparent flex flex-col justify-center p-6 sm:p-12 text-white">
+            <span className="text-xs font-bold tracking-[0.25em] text-[#F2DFCE] uppercase mb-2">
+              Curated Living Sanctuary
+            </span>
+            <h2 className="font-sans font-bold text-3xl sm:text-4xl text-white max-w-lg leading-tight">
+              Living Room Collection
+            </h2>
+            <p className="mt-2 text-xs sm:text-sm text-[#E7DFD4] max-w-md leading-relaxed">
+              Explore 16 handcrafted modern sofas, sculptural lounge chairs, fluted coffee tables, and contemporary consoles designed for elevated everyday comfort.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2 text-[11px]">
+              <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/25">16 Unique Pieces</span>
+              <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/25">FSC Solid Timber</span>
+              <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/25">Free Delivery Over $300</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Category Pills Slider */}
       <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-6 scrollbar-none">
         <button
