@@ -231,6 +231,33 @@ export default function Shop() {
         </div>
       )}
 
+      {/* Balcony Special Showcase Banner (Featured when viewing Balcony) */}
+      {cat === 'Balcony' && (
+        <div className="relative rounded-3xl overflow-hidden mb-10 h-64 sm:h-80 shadow-md border border-[#EFE8DC]">
+          <img
+            src="/images/balcony-banner.jpg"
+            alt="Forma Balcony Collection"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-transparent flex flex-col justify-center p-6 sm:p-12 text-white">
+            <span className="text-xs font-bold tracking-[0.25em] text-[#F2DFCE] uppercase mb-2">
+              Outdoor Sanctuary &amp; Fresh Air
+            </span>
+            <h2 className="font-sans font-bold text-3xl sm:text-4xl text-white max-w-lg leading-tight">
+              Balcony Collection
+            </h2>
+            <p className="mt-2 text-xs sm:text-sm text-[#E7DFD4] max-w-md leading-relaxed">
+              Enjoy open-air living with 16 compact bistro tables, weather-resistant wicker egg swings, folding teak loungers, and vertical botanical planters.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2 text-[11px]">
+              <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/25">16 Unique Pieces</span>
+              <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/25">All-Weather Teak &amp; Rattan</span>
+              <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/25">Space-Smart Designs</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Category Pills Slider */}
       <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-6 scrollbar-none">
         <button
