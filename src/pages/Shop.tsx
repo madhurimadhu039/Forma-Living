@@ -177,6 +177,33 @@ export default function Shop() {
         </div>
       )}
 
+      {/* Dining Room Special Showcase Banner (Featured when viewing Dining Room) */}
+      {cat === 'Dining Room' && (
+        <div className="relative rounded-3xl overflow-hidden mb-10 h-64 sm:h-80 shadow-md border border-[#EFE8DC]">
+          <img
+            src="/images/dining-room-banner.jpg"
+            alt="Forma Dining Room Collection"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-transparent flex flex-col justify-center p-6 sm:p-12 text-white">
+            <span className="text-xs font-bold tracking-[0.25em] text-[#F2DFCE] uppercase mb-2">
+              Artisan Gathering &amp; Dining
+            </span>
+            <h2 className="font-sans font-bold text-3xl sm:text-4xl text-white max-w-lg leading-tight">
+              Dining Room Collection
+            </h2>
+            <p className="mt-2 text-xs sm:text-sm text-[#E7DFD4] max-w-md leading-relaxed">
+              Elevate your dining space with 16 handcrafted solid oak pedestal tables, Italian Calacatta marble surfaces, woven cane dining chairs, and bespoke buffets.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2 text-[11px]">
+              <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/25">16 Unique Pieces</span>
+              <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/25">FSC White Oak &amp; Marble</span>
+              <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/25">Crafted for Gatherings</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Category Pills Slider */}
       <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-6 scrollbar-none">
         <button
