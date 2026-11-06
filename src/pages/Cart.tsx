@@ -68,13 +68,13 @@ export default function Cart() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 sm:px-6 py-12">
-      <div className="flex items-center justify-between pb-6 border-b border-[#EFE8DC]">
+    <div className="mx-auto max-w-4xl px-4 sm:px-6 py-6 sm:py-12">
+      <div className="flex items-center justify-between pb-4 sm:pb-6 border-b border-[#EFE8DC]">
         <div>
-          <h1 className="font-sans font-bold text-3xl sm:text-4xl text-[#2B231D]">
+          <h1 className="font-sans font-bold text-2xl sm:text-4xl text-[#2B231D]">
             Shopping Bag
           </h1>
-          <p className="mt-1 text-sm text-[#82756A]">
+          <p className="mt-1 text-xs sm:text-sm text-[#82756A]">
             {rows.length} {rows.length === 1 ? 'item' : 'items'} in your cart
           </p>
         </div>
@@ -89,56 +89,56 @@ export default function Cart() {
       </div>
 
       {rows.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-3xl border border-[#EFE8DC] mt-8 p-10">
-          <div className="w-16 h-16 rounded-full bg-[#FAF7F2] text-[#BD6024] flex items-center justify-center mx-auto mb-4 text-2xl">
+        <div className="text-center py-12 sm:py-20 bg-white rounded-2xl sm:rounded-3xl border border-[#EFE8DC] mt-6 sm:mt-8 p-6 sm:p-10">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#FAF7F2] text-[#BD6024] flex items-center justify-center mx-auto mb-4 text-2xl">
             🛒
           </div>
-          <h2 className="text-xl font-bold text-[#2B231D]">Your cart is empty</h2>
-          <p className="mt-2 text-sm text-[#82756A] max-w-sm mx-auto">
+          <h2 className="text-lg sm:text-xl font-bold text-[#2B231D]">Your cart is empty</h2>
+          <p className="mt-2 text-xs sm:text-sm text-[#82756A] max-w-sm mx-auto">
             Discover our stylish and comfortable designs to create your perfect space.
           </p>
           <Link
             to="/shop"
-            className="mt-6 inline-flex items-center gap-2 px-8 py-3.5 bg-[#BD6024] hover:bg-[#a5511c] text-white rounded-2xl font-semibold text-sm transition"
+            className="mt-6 inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 bg-[#BD6024] hover:bg-[#a5511c] text-white rounded-xl sm:rounded-2xl font-semibold text-xs sm:text-sm transition"
           >
             <span>Start Shopping</span>
             <span>→</span>
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 mt-6 sm:mt-8">
           {/* Items List */}
-          <div className="lg:col-span-7 space-y-4">
+          <div className="lg:col-span-7 space-y-3 sm:space-y-4">
             {rows.map(({ l, p }) => (
               <div
                 key={p.id}
-                className="bg-white rounded-2xl p-4 border border-[#EFE8DC] flex items-center gap-4 shadow-2xs"
+                className="bg-white rounded-2xl p-3 sm:p-4 border border-[#EFE8DC] flex items-center gap-3 sm:gap-4 shadow-2xs"
               >
-                <div className="w-20 h-20 rounded-xl overflow-hidden bg-[#FAF7F2] shrink-0 border border-[#EFE8DC]">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-[#FAF7F2] shrink-0 border border-[#EFE8DC]">
                   <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <Link to={`/product/${p.id}`} className="font-semibold text-sm text-[#2B231D] hover:text-[#BD6024] line-clamp-1">
+                  <Link to={`/product/${p.id}`} className="font-semibold text-xs sm:text-sm text-[#2B231D] hover:text-[#BD6024] line-clamp-1">
                     {p.name}
                   </Link>
-                  <p className="text-xs text-[#82756A] mt-0.5">{p.material} · {p.color}</p>
-                  <p className="text-sm font-bold text-[#BD6024] mt-1">{formatPrice(p.price)}</p>
+                  <p className="text-[11px] sm:text-xs text-[#82756A] mt-0.5 truncate">{p.material} · {p.color}</p>
+                  <p className="text-xs sm:text-sm font-bold text-[#BD6024] mt-0.5 sm:mt-1">{formatPrice(p.price)}</p>
                 </div>
 
                 {/* Quantity Controls */}
-                <div className="flex items-center gap-2 bg-[#FAF7F2] rounded-xl px-2 py-1 border border-[#EFE8DC]">
+                <div className="flex items-center gap-1 sm:gap-2 bg-[#FAF7F2] rounded-xl px-1.5 sm:px-2 py-1 border border-[#EFE8DC] shrink-0">
                   <button
                     onClick={() => setQty(p.id, l.qty - 1)}
-                    className="w-6 h-6 flex items-center justify-center text-sm font-bold text-[#6E6359] hover:text-[#2B231D]"
+                    className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center text-xs sm:text-sm font-bold text-[#6E6359] hover:text-[#2B231D]"
                   >
                     −
                   </button>
-                  <span className="text-xs font-semibold px-1">{l.qty}</span>
+                  <span className="text-xs font-semibold px-0.5 sm:px-1">{l.qty}</span>
                   <button
                     disabled={l.qty >= p.stock}
                     onClick={() => setQty(p.id, l.qty + 1)}
-                    className="w-6 h-6 flex items-center justify-center text-sm font-bold text-[#6E6359] hover:text-[#2B231D] disabled:opacity-30"
+                    className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center text-xs sm:text-sm font-bold text-[#6E6359] hover:text-[#2B231D] disabled:opacity-30"
                   >
                     +
                   </button>
@@ -149,12 +149,12 @@ export default function Cart() {
 
           {/* Order Summary */}
           <div className="lg:col-span-5">
-            <div className="bg-white rounded-3xl p-6 border border-[#EFE8DC] shadow-sm sticky top-24">
-              <h2 className="font-sans font-bold text-lg text-[#2B231D] pb-4 border-b border-[#EFE8DC]">
+            <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-[#EFE8DC] shadow-sm sticky top-24">
+              <h2 className="font-sans font-bold text-base sm:text-lg text-[#2B231D] pb-3 sm:pb-4 border-b border-[#EFE8DC]">
                 Order Summary
               </h2>
 
-              <div className="space-y-3 py-4 text-sm border-b border-[#EFE8DC]">
+              <div className="space-y-2.5 sm:space-y-3 py-3 sm:py-4 text-xs sm:text-sm border-b border-[#EFE8DC]">
                 <div className="flex justify-between text-[#6E6359]">
                   <span>Subtotal</span>
                   <span className="font-medium text-[#2B231D]">{formatPrice(subtotal)}</span>
@@ -176,15 +176,15 @@ export default function Cart() {
                 )}
               </div>
 
-              <div className="flex justify-between py-4 text-base font-bold text-[#2B231D]">
+              <div className="flex justify-between py-3 sm:py-4 text-sm sm:text-base font-bold text-[#2B231D]">
                 <span>Total Amount</span>
-                <span className="text-xl text-[#BD6024]">{formatPrice(total)}</span>
+                <span className="text-lg sm:text-xl text-[#BD6024]">{formatPrice(total)}</span>
               </div>
 
               <button
                 disabled={busy}
                 onClick={checkout}
-                className="w-full mt-2 py-4 rounded-2xl bg-[#BD6024] hover:bg-[#a5511c] disabled:opacity-50 text-white font-semibold text-base shadow-sm hover:shadow transition"
+                className="w-full mt-2 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-[#BD6024] hover:bg-[#a5511c] disabled:opacity-50 text-white font-semibold text-sm sm:text-base shadow-sm hover:shadow transition"
               >
                 {busy ? 'Processing Checkout…' : `Checkout (${formatPrice(total)})`}
               </button>

@@ -25,34 +25,34 @@ export default function Home() {
   }
 
   return (
-    <div className="space-y-16 sm:space-y-24">
+    <div className="space-y-12 sm:space-y-20 lg:space-y-24">
       {/* 1. HERO SECTION */}
-      <section className="pt-6 sm:pt-12 px-4 sm:px-6">
-        <div className="mx-auto max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+      <section className="pt-4 sm:pt-10 px-3 sm:px-6">
+        <div className="mx-auto max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           {/* Left Column: Heading, Subtext, CTA Button & Slider Dots */}
-          <div className="lg:col-span-5 flex flex-col justify-center">
-            <h1 className="font-sans font-extrabold text-5xl sm:text-6xl lg:text-[68px] leading-[1.08] tracking-tight text-[#2B231D]">
-              Stunning &<br />
+          <div className="lg:col-span-5 flex flex-col justify-center text-center lg:text-left items-center lg:items-start">
+            <h1 className="font-sans font-extrabold text-3xl sm:text-5xl lg:text-[68px] leading-[1.15] sm:leading-[1.08] tracking-tight text-[#2B231D]">
+              Stunning &amp;<br />
               Modern<br />
               <span className="text-[#BD6024]">Furniture</span>
             </h1>
 
-            <p className="mt-6 text-base sm:text-lg text-[#6E6359] max-w-md leading-relaxed font-normal">
+            <p className="mt-4 sm:mt-6 text-sm sm:text-lg text-[#6E6359] max-w-md leading-relaxed font-normal">
               Create your perfect space with our stylish and comfortable designs.
             </p>
 
-            <div className="mt-8">
+            <div className="mt-6 sm:mt-8">
               <Link
                 to="/shop"
-                className="inline-flex items-center gap-3 px-8 py-3.5 sm:py-4 rounded-2xl bg-[#BD6024] hover:bg-[#a5511c] text-white font-medium text-base shadow-sm hover:shadow-md transition active:scale-[0.99]"
+                className="inline-flex items-center gap-3 px-6 sm:px-8 py-3 sm:py-4 rounded-2xl bg-[#BD6024] hover:bg-[#a5511c] text-white font-medium text-sm sm:text-base shadow-sm hover:shadow-md transition active:scale-[0.99]"
               >
                 <span>Shop Now</span>
-                <span className="text-xl">→</span>
+                <span className="text-lg sm:text-xl">→</span>
               </Link>
             </div>
 
             {/* Slider Dots Indicator */}
-            <div className="mt-10 flex items-center gap-2">
+            <div className="mt-6 sm:mt-10 flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => setActiveSlide(0)}
@@ -81,17 +81,17 @@ export default function Home() {
           </div>
 
           {/* Right Column: Hero Living Room Showcase with Arch Backdrop */}
-          <div className="lg:col-span-7 relative flex justify-center">
+          <div className="lg:col-span-7 relative flex justify-center w-full">
             {/* Curved Arch Decorative Backdrop */}
-            <div className="relative w-full max-w-lg lg:max-w-none">
-              <div className="absolute inset-0 top-6 -bottom-6 bg-[#EFE8DC]/80 rounded-t-[180px] rounded-b-[40px] -z-10 translate-y-3 scale-[1.02]"></div>
+            <div className="relative w-full max-w-md lg:max-w-none">
+              <div className="absolute inset-0 top-4 -bottom-4 sm:top-6 sm:-bottom-6 bg-[#EFE8DC]/80 rounded-t-[120px] sm:rounded-t-[180px] rounded-b-[30px] sm:rounded-b-[40px] -z-10 translate-y-2 scale-[1.01]"></div>
 
               {/* Main Living Room Image */}
-              <div className="relative overflow-hidden rounded-t-[160px] rounded-b-3xl shadow-lg border-4 border-white/80 bg-[#FAF7F2]">
+              <div className="relative overflow-hidden rounded-t-[110px] sm:rounded-t-[160px] rounded-b-2xl sm:rounded-b-3xl shadow-lg border-2 sm:border-4 border-white/80 bg-[#FAF7F2]">
                 <img
                   src="/images/hero-living-room.jpg"
                   alt="Stunning & Modern Living Room with Cream Sofa, Armchair, and Coffee Table"
-                  className="w-full h-[360px] sm:h-[460px] lg:h-[500px] object-cover hover:scale-105 transition duration-700"
+                  className="w-full h-[260px] sm:h-[440px] lg:h-[500px] object-cover hover:scale-105 transition duration-700"
                 />
               </div>
             </div>
@@ -100,13 +100,13 @@ export default function Home() {
       </section>
 
       {/* 2. VALUE PROPOSITIONS / FEATURES BAR */}
-      <section className="px-4 sm:px-6">
-        <div className="mx-auto max-w-5xl bg-white rounded-3xl shadow-sm border border-[#EFE8DC] p-6 sm:p-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+      <section className="px-3 sm:px-6">
+        <div className="mx-auto max-w-5xl bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-[#EFE8DC] p-4 sm:p-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8">
             {/* Feature 1: Free Delivery */}
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-[#FCEEE2] flex items-center justify-center shrink-0 text-[#BD6024]">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-[#FCEEE2] flex items-center justify-center shrink-0 text-[#BD6024]">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 sm:w-7 sm:h-7">
                   <rect x="1" y="3" width="15" height="13" rx="2" />
                   <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
                   <circle cx="5.5" cy="18.5" r="2.5" />
@@ -114,36 +114,36 @@ export default function Home() {
                 </svg>
               </div>
               <div>
-                <h2 className="font-bold text-[#2B231D] text-base">Free Delivery</h2>
-                <p className="text-xs sm:text-sm text-[#82756A] mt-0.5">Fast &amp; Safe</p>
+                <h2 className="font-bold text-[#2B231D] text-sm sm:text-base">Free Delivery</h2>
+                <p className="text-xs sm:text-sm text-[#82756A] mt-0.5">Fast &amp; Safe Nationwide</p>
               </div>
             </div>
 
             {/* Feature 2: High Quality */}
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-[#FCEEE2] flex items-center justify-center shrink-0 text-[#BD6024]">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-[#FCEEE2] flex items-center justify-center shrink-0 text-[#BD6024]">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 sm:w-7 sm:h-7">
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                   <polyline points="9 12 11 14 15 10" />
                 </svg>
               </div>
               <div>
-                <h2 className="font-bold text-[#2B231D] text-base">High Quality</h2>
-                <p className="text-xs sm:text-sm text-[#82756A] mt-0.5">Premium Materials</p>
+                <h2 className="font-bold text-[#2B231D] text-sm sm:text-base">High Quality</h2>
+                <p className="text-xs sm:text-sm text-[#82756A] mt-0.5">FSC Solid Woods &amp; Fabrics</p>
               </div>
             </div>
 
             {/* Feature 3: Best Prices */}
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-[#FCEEE2] flex items-center justify-center shrink-0 text-[#BD6024]">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-[#FCEEE2] flex items-center justify-center shrink-0 text-[#BD6024]">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 sm:w-7 sm:h-7">
                   <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
                   <line x1="7" y1="7" x2="7.01" y2="7" />
                 </svg>
               </div>
               <div>
-                <h2 className="font-bold text-[#2B231D] text-base">Best Prices</h2>
-                <p className="text-xs sm:text-sm text-[#82756A] mt-0.5">Affordable Choices</p>
+                <h2 className="font-bold text-[#2B231D] text-sm sm:text-base">Best Prices</h2>
+                <p className="text-xs sm:text-sm text-[#82756A] mt-0.5">Direct-from-Studio Value</p>
               </div>
             </div>
           </div>
@@ -151,13 +151,13 @@ export default function Home() {
       </section>
 
       {/* 3. POPULAR PRODUCTS SECTION */}
-      <section className="px-4 sm:px-6">
+      <section className="px-3 sm:px-6">
         <div className="mx-auto max-w-6xl relative">
           {/* Section Header with Decorative Dots */}
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-6 sm:mb-8">
             <div className="w-12 hidden sm:block"></div>
             <div className="text-center mx-auto">
-              <h2 className="text-2xl sm:text-3xl font-bold text-[#2B231D] tracking-tight flex items-center justify-center gap-3">
+              <h2 className="text-xl sm:text-3xl font-bold text-[#2B231D] tracking-tight flex items-center justify-center gap-2 sm:gap-3">
                 <span className="text-[#C7BCB0] font-light">—</span>
                 Popular Products
                 <span className="text-[#C7BCB0] font-light">—</span>
@@ -176,17 +176,17 @@ export default function Home() {
             </div>
           </div>
 
-          {/* 4 Popular Product Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* 4 Popular Product Cards (2 cols on mobile for compact native shopping experience) */}
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
             {popularProducts.map(product => {
               const inWish = wishlist.includes(product.id)
               return (
                 <div
                   key={product.id}
-                  className="group bg-white rounded-3xl p-3.5 shadow-sm border border-[#EFE8DC] hover:shadow-md transition-all duration-300 flex flex-col justify-between"
+                  className="group bg-white rounded-2xl sm:rounded-3xl p-2.5 sm:p-3.5 shadow-sm border border-[#EFE8DC] hover:shadow-md transition-all duration-300 flex flex-col justify-between"
                 >
                   <Link to={`/product/${product.id}`} className="block">
-                    <div className="aspect-[4/3.8] rounded-2xl overflow-hidden bg-[#F6F2EC]">
+                    <div className="aspect-[4/3.8] rounded-xl sm:rounded-2xl overflow-hidden bg-[#F6F2EC]">
                       <img
                         src={product.image}
                         alt={product.name}
@@ -198,21 +198,21 @@ export default function Home() {
                       />
                     </div>
 
-                    <h3 className="mt-4 font-semibold text-[#2B231D] text-base group-hover:text-[#BD6024] transition">
+                    <h3 className="mt-2.5 sm:mt-4 font-semibold text-[#2B231D] text-xs sm:text-base group-hover:text-[#BD6024] transition line-clamp-1">
                       {product.name}
                     </h3>
                   </Link>
 
-                  <div className="mt-2 pt-1 flex items-center justify-between">
-                    <span className="font-bold text-[#BD6024] text-base">
+                  <div className="mt-2 pt-1 flex items-center justify-between gap-1">
+                    <span className="font-bold text-[#BD6024] text-xs sm:text-base">
                       ${product.price}
                     </span>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1 sm:gap-2">
                       <button
                         type="button"
                         onClick={() => add(product.id)}
-                        className="text-xs bg-[#FAF7F2] hover:bg-[#BD6024] text-[#2B231D] hover:text-white font-medium px-2.5 py-1.5 rounded-lg border border-[#EFE8DC] transition"
+                        className="text-[10px] sm:text-xs bg-[#FAF7F2] hover:bg-[#BD6024] text-[#2B231D] hover:text-white font-medium px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg border border-[#EFE8DC] transition"
                         title="Add to Cart"
                       >
                         + Cart
@@ -222,7 +222,7 @@ export default function Home() {
                         type="button"
                         onClick={() => toggleWish(product.id)}
                         aria-label={`Add ${product.name} to wishlist`}
-                        className={`w-9 h-9 rounded-full flex items-center justify-center transition ${
+                        className={`w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition shrink-0 ${
                           inWish
                             ? 'bg-[#FCEEE2] text-[#BD6024]'
                             : 'text-[#82756A] hover:bg-[#FAF7F2] hover:text-[#BD6024]'
@@ -235,7 +235,7 @@ export default function Home() {
                           strokeWidth="2"
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                          className="w-5 h-5"
+                          className="w-3.5 h-3.5 sm:w-5 sm:h-5"
                         >
                           <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
                         </svg>
@@ -248,99 +248,99 @@ export default function Home() {
           </div>
 
           {/* View All Products CTA Button */}
-          <div className="mt-12 text-center">
+          <div className="mt-8 sm:mt-12 text-center">
             <Link
               to="/shop"
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-[#2B231D] hover:bg-[#3F332B] text-white text-sm font-semibold tracking-wide transition shadow-sm hover:shadow"
+              className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 rounded-full bg-[#2B231D] hover:bg-[#3F332B] text-white text-xs sm:text-sm font-semibold tracking-wide transition shadow-sm hover:shadow"
             >
               <span>View All Products</span>
-              <span className="text-base">→</span>
+              <span className="text-sm sm:text-base">→</span>
             </Link>
           </div>
         </div>
       </section>
 
       {/* 4. TRANSFORM YOUR HOME BANNER (DEEP FOREST GREEN) */}
-      <section className="px-4 sm:px-6">
-        <div className="mx-auto max-w-6xl rounded-3xl bg-[#344030] p-6 sm:p-10 lg:p-12 text-white shadow-lg">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+      <section className="px-3 sm:px-6">
+        <div className="mx-auto max-w-6xl rounded-2xl sm:rounded-3xl bg-[#344030] p-4 sm:p-10 lg:p-12 text-white shadow-lg">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-10 items-center">
             {/* Left Content */}
-            <div className="lg:col-span-4 flex flex-col justify-center">
-              <h2 className="text-3xl sm:text-4xl font-sans font-bold text-white tracking-tight leading-tight">
+            <div className="lg:col-span-4 flex flex-col justify-center text-center lg:text-left">
+              <h2 className="text-2xl sm:text-4xl font-sans font-bold text-white tracking-tight leading-tight">
                 Transform Your Home
               </h2>
-              <p className="mt-4 text-[#CAD5C6] text-sm sm:text-base leading-relaxed">
+              <p className="mt-2 sm:mt-4 text-[#CAD5C6] text-xs sm:text-base leading-relaxed">
                 Explore our collections and find the perfect pieces to elevate your interior.
               </p>
-              <div className="mt-6">
+              <div className="mt-4 sm:mt-6">
                 <Link
                   to="/shop"
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-[#F2DFCE] hover:text-white underline underline-offset-4 transition"
+                  className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#F2DFCE] hover:text-white underline underline-offset-4 transition"
                 >
                   Explore All Collections →
                 </Link>
               </div>
             </div>
 
-            {/* Right Collection Cards (3 Vertical Cards) */}
-            <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+            {/* Right Collection Cards (3 Horizontal Cards on mobile, neatly sized) */}
+            <div className="lg:col-span-8 grid grid-cols-3 gap-2 sm:gap-5">
               {/* Card 1: New Arrivals */}
               <Link
                 to="/shop?category=Living%20Room"
-                className="group bg-white rounded-2xl p-2.5 sm:p-3 text-center flex flex-col items-center shadow-sm hover:shadow-md transition duration-300"
+                className="group bg-white rounded-xl sm:rounded-2xl p-2 sm:p-3 text-center flex flex-col items-center shadow-sm hover:shadow-md transition duration-300"
               >
-                <div className="aspect-[3/3.8] w-full rounded-xl overflow-hidden bg-[#FAF7F2]">
+                <div className="aspect-[3/3.8] w-full rounded-lg sm:rounded-xl overflow-hidden bg-[#FAF7F2]">
                   <img
                     src="/images/collection-new-arrivals.jpg"
                     alt="New Arrivals Natural Rattan Chair"
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                   />
                 </div>
-                <div className="mt-3 mb-1 flex items-center justify-center gap-2 text-[#2B231D]">
-                  <span className="w-6 h-6 rounded-full bg-[#344030] text-[#F2DFCE] flex items-center justify-center text-xs">
+                <div className="mt-2 sm:mt-3 mb-0.5 sm:mb-1 flex items-center justify-center gap-1 sm:gap-2 text-[#2B231D]">
+                  <span className="w-4 h-4 sm:w-6 sm:h-6 rounded-full bg-[#344030] text-[#F2DFCE] flex items-center justify-center text-[9px] sm:text-xs">
                     ★
                   </span>
-                  <span className="font-semibold text-xs sm:text-sm">New Arrivals</span>
+                  <span className="font-semibold text-[10px] sm:text-sm line-clamp-1">New Arrivals</span>
                 </div>
               </Link>
 
               {/* Card 2: Minimalist Design */}
               <Link
                 to="/shop?category=Storage"
-                className="group bg-white rounded-2xl p-2.5 sm:p-3 text-center flex flex-col items-center shadow-sm hover:shadow-md transition duration-300"
+                className="group bg-white rounded-xl sm:rounded-2xl p-2 sm:p-3 text-center flex flex-col items-center shadow-sm hover:shadow-md transition duration-300"
               >
-                <div className="aspect-[3/3.8] w-full rounded-xl overflow-hidden bg-[#FAF7F2]">
+                <div className="aspect-[3/3.8] w-full rounded-lg sm:rounded-xl overflow-hidden bg-[#FAF7F2]">
                   <img
                     src="/images/collection-minimalist.jpg"
                     alt="Minimalist Design White Display Shelving"
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                   />
                 </div>
-                <div className="mt-3 mb-1 flex items-center justify-center gap-2 text-[#2B231D]">
-                  <span className="w-6 h-6 rounded-full bg-[#344030] text-[#F2DFCE] flex items-center justify-center text-xs">
+                <div className="mt-2 sm:mt-3 mb-0.5 sm:mb-1 flex items-center justify-center gap-1 sm:gap-2 text-[#2B231D]">
+                  <span className="w-4 h-4 sm:w-6 sm:h-6 rounded-full bg-[#344030] text-[#F2DFCE] flex items-center justify-center text-[9px] sm:text-xs">
                     🛋
                   </span>
-                  <span className="font-semibold text-xs sm:text-sm">Minimalist Design</span>
+                  <span className="font-semibold text-[10px] sm:text-sm line-clamp-1">Minimalist</span>
                 </div>
               </Link>
 
               {/* Card 3: Special Offers */}
               <Link
                 to="/shop"
-                className="group bg-white rounded-2xl p-2.5 sm:p-3 text-center flex flex-col items-center shadow-sm hover:shadow-md transition duration-300"
+                className="group bg-white rounded-xl sm:rounded-2xl p-2 sm:p-3 text-center flex flex-col items-center shadow-sm hover:shadow-md transition duration-300"
               >
-                <div className="aspect-[3/3.8] w-full rounded-xl overflow-hidden bg-[#FAF7F2]">
+                <div className="aspect-[3/3.8] w-full rounded-lg sm:rounded-xl overflow-hidden bg-[#FAF7F2]">
                   <img
                     src="/images/collection-special-offers.jpg"
                     alt="Special Offers Warm Velvet Pouf"
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                   />
                 </div>
-                <div className="mt-3 mb-1 flex items-center justify-center gap-2 text-[#2B231D]">
-                  <span className="w-6 h-6 rounded-full bg-[#344030] text-[#F2DFCE] flex items-center justify-center text-xs">
+                <div className="mt-2 sm:mt-3 mb-0.5 sm:mb-1 flex items-center justify-center gap-1 sm:gap-2 text-[#2B231D]">
+                  <span className="w-4 h-4 sm:w-6 sm:h-6 rounded-full bg-[#344030] text-[#F2DFCE] flex items-center justify-center text-[9px] sm:text-xs">
                     %
                   </span>
-                  <span className="font-semibold text-xs sm:text-sm">Special Offers</span>
+                  <span className="font-semibold text-[10px] sm:text-sm line-clamp-1">Special Offers</span>
                 </div>
               </Link>
             </div>
@@ -349,31 +349,31 @@ export default function Home() {
       </section>
 
       {/* 5. SHOP BY CATEGORY SECTION */}
-      <section className="px-4 sm:px-6">
+      <section className="px-3 sm:px-6">
         <div className="mx-auto max-w-6xl">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
+          <div className="flex flex-row items-end justify-between mb-5 sm:mb-8 gap-2">
             <div>
-              <p className="text-xs font-bold tracking-[0.2em] text-[#BD6024] uppercase">Browse Collections</p>
-              <h2 className="text-2xl sm:text-3xl font-bold text-[#2B231D] tracking-tight mt-1">
+              <p className="text-[10px] sm:text-xs font-bold tracking-[0.2em] text-[#BD6024] uppercase">Browse Collections</p>
+              <h2 className="text-xl sm:text-3xl font-bold text-[#2B231D] tracking-tight mt-0.5 sm:mt-1">
                 Shop by Category
               </h2>
             </div>
             <Link
               to="/shop"
-              className="text-sm font-semibold text-[#BD6024] hover:text-[#a5511c] transition flex items-center gap-1"
+              className="text-xs sm:text-sm font-semibold text-[#BD6024] hover:text-[#a5511c] transition flex items-center gap-1 shrink-0"
             >
-              <span>View full catalog</span>
+              <span>Catalog</span>
               <span>→</span>
             </Link>
           </div>
 
-          {/* Category Cards Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-5">
+          {/* Category Cards Grid (Responsive padding & text so labels never wrap awkwardly on 360px phones) */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-2.5 sm:gap-5">
             {categoryList.map(cat => (
               <Link
                 key={cat.name}
                 to={`/shop?category=${encodeURIComponent(cat.name)}`}
-                className="group relative h-48 sm:h-56 rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition duration-300 flex flex-col justify-end p-5"
+                className="group relative h-36 sm:h-56 rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition duration-300 flex flex-col justify-end p-3 sm:p-5"
               >
                 <img
                   src={cat.image}
@@ -381,13 +381,13 @@ export default function Home() {
                   loading="lazy"
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-700 brightness-[0.88] group-hover:brightness-[0.8]"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent"></div>
 
                 <div className="relative z-10 text-white">
-                  <h3 className="font-sans font-bold text-lg sm:text-xl leading-snug">
+                  <h3 className="font-sans font-bold text-sm sm:text-xl leading-snug line-clamp-1">
                     {cat.name}
                   </h3>
-                  <p className="text-xs text-white/80 mt-1 line-clamp-1">
+                  <p className="text-[10px] sm:text-xs text-white/80 mt-0.5 sm:mt-1 line-clamp-1 hidden sm:block">
                     {cat.description}
                   </p>
                 </div>
@@ -398,22 +398,22 @@ export default function Home() {
       </section>
 
       {/* 6. COMPACT & PROFESSIONAL DARK FOOTER (ONLY ON HOME PAGE) */}
-      <footer className="w-full bg-[#1E1914] text-[#FAF7F2] border-t border-[#332A22] shadow-lg pt-10 pb-8 px-6 sm:px-10 lg:px-16 xl:px-20 mt-16 sm:mt-24">
+      <footer className="w-full bg-[#1E1914] text-[#FAF7F2] border-t border-[#332A22] shadow-lg pt-8 sm:pt-10 pb-8 px-4 sm:px-10 lg:px-16 xl:px-20 mt-12 sm:mt-24">
         <div className="w-full">
           {/* Main Grid: Balanced & Full Viewport Distribution */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-12 pb-8 border-b border-[#31271F] w-full">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 pb-6 sm:pb-8 border-b border-[#31271F] w-full">
             {/* Col 1: Brand & Tagline - Left */}
-            <div className="sm:col-span-2 lg:col-span-4 space-y-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg border border-[#BD6024] bg-[#29221C] flex items-center justify-center p-1">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#BD6024]">
+            <div className="sm:col-span-2 lg:col-span-4 space-y-2.5 sm:space-y-3">
+              <div className="flex items-center gap-2 sm:gap-2.5">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg border border-[#BD6024] bg-[#29221C] flex items-center justify-center p-1">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 sm:w-5 sm:h-5 text-[#BD6024]">
                     <path d="M19 9V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3" />
                     <path d="M3 11a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5z" />
                     <path d="M6 18v2" />
                     <path d="M18 18v2" />
                   </svg>
                 </div>
-                <span className="font-sans font-bold text-xl tracking-tight text-white">
+                <span className="font-sans font-bold text-lg sm:text-xl tracking-tight text-white">
                   Forma Living
                 </span>
               </div>
@@ -461,26 +461,28 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Col 2: Navigation Links - Middle */}
-            <div className="lg:col-span-2">
-              <p className="text-xs font-bold tracking-wider uppercase text-white mb-3">Shop</p>
-              <ul className="space-y-1.5 text-xs text-[#A89E93]">
-                <li><Link to="/shop" className="hover:text-white transition">All Products</Link></li>
-                <li><Link to="/shop?category=Living%20Room" className="hover:text-white transition">Living Room</Link></li>
-                <li><Link to="/shop?category=Dining%20Room" className="hover:text-white transition">Dining Room</Link></li>
-                <li><Link to="/shop?category=Bedroom" className="hover:text-white transition">Bedroom</Link></li>
-              </ul>
-            </div>
+            {/* Col 2 & 3: Navigation Links - 2 Columns on mobile */}
+            <div className="grid grid-cols-2 gap-4 sm:col-span-2 lg:col-span-4">
+              <div>
+                <p className="text-xs font-bold tracking-wider uppercase text-white mb-2 sm:mb-3">Shop</p>
+                <ul className="space-y-1.5 text-xs text-[#A89E93]">
+                  <li><Link to="/shop" className="hover:text-white transition">All Products</Link></li>
+                  <li><Link to="/shop?category=Living%20Room" className="hover:text-white transition">Living Room</Link></li>
+                  <li><Link to="/shop?category=Dining%20Room" className="hover:text-white transition">Dining Room</Link></li>
+                  <li><Link to="/shop?category=Bedroom" className="hover:text-white transition">Bedroom</Link></li>
+                  <li><Link to="/shop?category=Outdoor%20Furniture" className="hover:text-white transition">Outdoor</Link></li>
+                </ul>
+              </div>
 
-            {/* Col 3: Company - Middle */}
-            <div className="lg:col-span-2">
-              <p className="text-xs font-bold tracking-wider uppercase text-white mb-3">Company</p>
-              <ul className="space-y-1.5 text-xs text-[#A89E93]">
-                <li><Link to="/about" className="hover:text-white transition">About Us</Link></li>
-                <li><Link to="/contact" className="hover:text-white transition">Contact Concierge</Link></li>
-                <li><Link to="/privacy" className="hover:text-white transition">Privacy Policy</Link></li>
-                <li><Link to="/terms" className="hover:text-white transition">Terms &amp; Conditions</Link></li>
-              </ul>
+              <div>
+                <p className="text-xs font-bold tracking-wider uppercase text-white mb-2 sm:mb-3">Company</p>
+                <ul className="space-y-1.5 text-xs text-[#A89E93]">
+                  <li><Link to="/about" className="hover:text-white transition">About Us</Link></li>
+                  <li><Link to="/contact" className="hover:text-white transition">Concierge</Link></li>
+                  <li><Link to="/privacy" className="hover:text-white transition">Privacy Policy</Link></li>
+                  <li><Link to="/terms" className="hover:text-white transition">Terms</Link></li>
+                </ul>
+              </div>
             </div>
 
             {/* Col 4: Compact Newsletter - Right */}
@@ -492,7 +494,7 @@ export default function Home() {
                   ✓ Thank you! You’re on the Forma list.
                 </div>
               ) : (
-                <form onSubmit={handleNewsletter} className="flex gap-2 max-w-md">
+                <form onSubmit={handleNewsletter} className="flex flex-col sm:flex-row gap-2 max-w-md">
                   <input
                     type="email"
                     required
@@ -513,10 +515,10 @@ export default function Home() {
           </div>
 
           {/* Bottom Bar: Copyright on Left & Payment Badges on Right */}
-          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 w-full text-xs text-[#7A7066]">
-            <p className="text-left">© 2026 Forma Living — Shape Your Space. All rights reserved.</p>
+          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 w-full text-xs text-[#7A7066] text-center sm:text-left">
+            <p>© 2026 Forma Living — Shape Your Space. All rights reserved.</p>
 
-            <div className="flex items-center gap-1.5 text-[10px] text-[#A89E93] sm:ml-auto">
+            <div className="flex flex-wrap justify-center items-center gap-1.5 text-[10px] text-[#A89E93] sm:ml-auto">
               <span className="px-2 py-0.5 rounded bg-[#29221C] border border-[#3D332B]">VISA</span>
               <span className="px-2 py-0.5 rounded bg-[#29221C] border border-[#3D332B]">MC</span>
               <span className="px-2 py-0.5 rounded bg-[#29221C] border border-[#3D332B]">AMEX</span>

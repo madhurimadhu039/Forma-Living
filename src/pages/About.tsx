@@ -4,14 +4,14 @@ export default function About() {
   return (
     <div className="space-y-16 sm:space-y-20 pb-16">
       {/* Hero Section */}
-      <section className="pt-8 sm:pt-14 px-4 sm:px-6">
+      <section className="pt-6 sm:pt-14 px-4 sm:px-6">
         <div className="mx-auto max-w-5xl text-center">
           <p className="text-xs font-bold tracking-[0.25em] text-[#BD6024] uppercase">Our Story</p>
-          <h1 className="mt-3 font-sans font-extrabold text-4xl sm:text-5xl lg:text-6xl text-[#2B231D] tracking-tight leading-tight">
+          <h1 className="mt-3 font-sans font-extrabold text-3xl sm:text-5xl lg:text-6xl text-[#2B231D] tracking-tight leading-tight">
             Crafting Spaces That Inspire <br className="hidden sm:inline" />
             <span className="text-[#BD6024]">&amp; Endure.</span>
           </h1>
-          <p className="mt-6 text-base sm:text-lg text-[#6E6359] max-w-2xl mx-auto leading-relaxed">
+          <p className="mt-4 sm:mt-6 text-sm sm:text-lg text-[#6E6359] max-w-2xl mx-auto leading-relaxed">
             Forma Living was founded on a simple principle: furniture should be an extension of your life’s best moments — thoughtfully designed, sustainably crafted, and built to last generations.
           </p>
         </div>
@@ -20,14 +20,14 @@ export default function About() {
       {/* Visual Banner */}
       <section className="px-4 sm:px-6">
         <div className="mx-auto max-w-6xl">
-          <div className="relative rounded-3xl overflow-hidden h-72 sm:h-96 shadow-md border border-[#EFE8DC]">
+          <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden h-56 sm:h-96 shadow-md border border-[#EFE8DC]">
             <img
               src="/images/hero-living-room.jpg"
               alt="Forma Living modern interior showcase"
               className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-6 sm:p-10">
-              <p className="text-white font-sans text-xl sm:text-2xl font-bold max-w-md">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-5 sm:p-10">
+              <p className="text-white font-sans text-lg sm:text-2xl font-bold max-w-md">
                 “Shape your space, shape your life.”
               </p>
             </div>
@@ -91,21 +91,21 @@ export default function About() {
 
       {/* CTA Box */}
       <section className="px-4 sm:px-6">
-        <div className="mx-auto max-w-4xl rounded-3xl bg-[#344030] p-8 sm:p-12 text-center text-white shadow-md">
-          <h2 className="text-2xl sm:text-3xl font-bold font-sans">Ready to transform your home?</h2>
-          <p className="mt-3 text-sm sm:text-base text-[#CAD5C6] max-w-md mx-auto">
+        <div className="mx-auto max-w-4xl rounded-2xl sm:rounded-3xl bg-[#344030] p-6 sm:p-12 text-center text-white shadow-md">
+          <h2 className="text-xl sm:text-3xl font-bold font-sans">Ready to transform your home?</h2>
+          <p className="mt-2.5 sm:mt-3 text-xs sm:text-base text-[#CAD5C6] max-w-md mx-auto">
             Explore our curated catalog of chairs, sofas, tables, and lighting.
           </p>
-          <div className="mt-6 flex flex-wrap justify-center gap-4">
+          <div className="mt-5 sm:mt-6 flex flex-wrap justify-center gap-3 sm:gap-4">
             <Link
               to="/shop"
-              className="px-8 py-3.5 bg-[#BD6024] hover:bg-[#a5511c] text-white rounded-2xl font-semibold text-sm transition shadow-sm"
+              className="px-6 sm:px-8 py-3 sm:py-3.5 bg-[#BD6024] hover:bg-[#a5511c] text-white rounded-xl sm:rounded-2xl font-semibold text-xs sm:text-sm transition shadow-sm"
             >
               Shop Collections →
             </Link>
             <Link
               to="/contact"
-              className="px-8 py-3.5 bg-white/10 hover:bg-white/20 text-white rounded-2xl font-semibold text-sm transition border border-white/20"
+              className="px-6 sm:px-8 py-3 sm:py-3.5 bg-white/10 hover:bg-white/20 text-white rounded-xl sm:rounded-2xl font-semibold text-xs sm:text-sm transition border border-white/20"
             >
               Contact Our Designers
             </Link>

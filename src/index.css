@@ -1,3 +1,32 @@
-@tailwind base;@tailwind components;@tailwind utilities;
-body{@apply bg-ivory text-ink font-sans antialiased}
-.btn{@apply inline-flex items-center justify-center rounded-md bg-ink px-6 py-3 text-sm font-medium text-ivory transition hover:bg-walnut disabled:opacity-50}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+body {
+  @apply bg-ivory text-ink font-sans antialiased;
+  overflow-x: hidden;
+  width: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center rounded-md bg-ink px-6 py-3 text-sm font-medium text-ivory transition hover:bg-walnut disabled:opacity-50;
+}

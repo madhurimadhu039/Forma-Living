@@ -27,13 +27,13 @@ export default function Login() {
   }
 
   return (
-    <div className="mx-auto max-w-md px-4 py-16">
-      <div className="bg-white rounded-3xl p-8 border border-[#EFE8DC] shadow-sm">
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-block mb-3 font-sans font-bold text-2xl text-[#2B231D]">
+    <div className="mx-auto max-w-md px-4 py-8 sm:py-16">
+      <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-8 border border-[#EFE8DC] shadow-sm">
+        <div className="text-center mb-6 sm:mb-8">
+          <Link to="/" className="inline-block mb-2 sm:mb-3 font-sans font-bold text-xl sm:text-2xl text-[#2B231D]">
             Forma Living
           </Link>
-          <h1 className="font-sans font-bold text-2xl text-[#2B231D]">
+          <h1 className="font-sans font-bold text-xl sm:text-2xl text-[#2B231D]">
             {mode === 'in' ? 'Welcome back' : 'Create an account'}
           </h1>
           <p className="mt-1 text-xs text-[#82756A]">
