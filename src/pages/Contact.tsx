@@ -1,4 +1,5 @@
 import { useState, FormEvent } from 'react'
+import { Link } from 'react-router-dom'
 
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false)
@@ -10,7 +11,21 @@ export default function Contact() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 sm:px-6 py-8 sm:py-16">
+    <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6 sm:py-12">
+      {/* Back to Home Button */}
+      <div className="mb-4 sm:mb-6">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#EFE8DC] text-xs font-semibold text-[#2B231D] hover:bg-[#FCEEE2] hover:text-[#BD6024] hover:border-[#BD6024]/50 shadow-2xs transition group"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 text-[#BD6024] group-hover:-translate-x-1 transition-transform">
+            <line x1="19" y1="12" x2="5" y2="12" />
+            <polyline points="12 19 5 12 12 5" />
+          </svg>
+          <span>Back to Home</span>
+        </Link>
+      </div>
+
       <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-16">
         <p className="text-xs font-bold tracking-[0.25em] text-[#BD6024] uppercase">We’re Here to Help</p>
         <h1 className="mt-2.5 sm:mt-3 font-sans font-extrabold text-3xl sm:text-5xl text-[#2B231D] tracking-tight">

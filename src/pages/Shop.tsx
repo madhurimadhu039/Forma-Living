@@ -104,14 +104,23 @@ export default function Shop() {
     <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6 sm:py-10">
       {/* Page Title & Breadcrumb */}
       <div className="mb-6 sm:mb-8">
-        <div className="flex items-center gap-2 text-xs text-[#82756A] mb-2">
-          <Link to="/" className="hover:text-[#BD6024]">Home</Link>
-          <span>/</span>
-          <span>Shop</span>
+        <div className="flex flex-wrap items-center gap-2.5 text-xs text-[#82756A] mb-3">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#EFE8DC] font-semibold text-[#2B231D] hover:bg-[#FCEEE2] hover:text-[#BD6024] hover:border-[#BD6024]/50 shadow-2xs transition group"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 text-[#BD6024] group-hover:-translate-x-1 transition-transform">
+              <line x1="19" y1="12" x2="5" y2="12" />
+              <polyline points="12 19 5 12 12 5" />
+            </svg>
+            <span>Back to Home</span>
+          </Link>
+          <span className="text-[#D7CDC1]">/</span>
+          <Link to="/shop" className="hover:text-[#BD6024] font-medium">Shop</Link>
           {cat && (
             <>
-              <span>/</span>
-              <span className="text-[#2B231D] font-medium">{cat}</span>
+              <span className="text-[#D7CDC1]">/</span>
+              <span className="text-[#2B231D] font-bold">{cat}</span>
             </>
           )}
         </div>

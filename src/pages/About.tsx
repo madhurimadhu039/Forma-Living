@@ -3,6 +3,20 @@ import { Link } from 'react-router-dom'
 export default function About() {
   return (
     <div className="space-y-16 sm:space-y-20 pb-16">
+      {/* Back to Home Button */}
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 pt-6 -mb-10 sm:-mb-12">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#EFE8DC] text-xs font-semibold text-[#2B231D] hover:bg-[#FCEEE2] hover:text-[#BD6024] hover:border-[#BD6024]/50 shadow-2xs transition group"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 text-[#BD6024] group-hover:-translate-x-1 transition-transform">
+            <line x1="19" y1="12" x2="5" y2="12" />
+            <polyline points="12 19 5 12 12 5" />
+          </svg>
+          <span>Back to Home</span>
+        </Link>
+      </div>
+
       {/* Hero Section */}
       <section className="pt-6 sm:pt-14 px-4 sm:px-6">
         <div className="mx-auto max-w-5xl text-center">

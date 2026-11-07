@@ -34,23 +34,49 @@ export function Layout() {
       {/* Top Header */}
       <header className="sticky top-0 z-30 bg-[#FAF7F2]/95 backdrop-blur-md border-b border-[#EFE8DC]/90 transition">
         <div className="mx-auto max-w-6xl px-3 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2 sm:gap-4">
-          {/* Logo with "Forma Living" */}
-          <Link to="/" className="flex items-center gap-2 group shrink-0">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl border-2 border-[#2B231D] flex items-center justify-center p-1 sm:p-1.5 transition group-hover:border-[#BD6024]">
-              {/* Armchair Icon */}
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 sm:w-5 sm:h-5 text-[#2B231D] group-hover:text-[#BD6024] transition">
-                <path d="M19 9V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3" />
-                <path d="M3 11a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5z" />
-                <path d="M6 18v2" />
-                <path d="M18 18v2" />
-                <path d="M4 12v3" />
-                <path d="M20 12v3" />
-              </svg>
-            </div>
-            <span className="font-sans font-bold text-lg sm:text-2xl tracking-tight text-[#2B231D]">
-              Forma Living
-            </span>
-          </Link>
+          {/* Top Left: Back to Home button (when not on Home page) + Brand Logo */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {location.pathname !== '/' && (
+              <Link
+                to="/"
+                aria-label="Back to Home"
+                className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-white border border-[#EFE8DC] text-xs font-semibold text-[#2B231D] hover:bg-[#FCEEE2] hover:text-[#BD6024] hover:border-[#BD6024]/50 shadow-2xs transition group shrink-0"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-3.5 h-3.5 text-[#BD6024] group-hover:-translate-x-0.5 transition-transform"
+                >
+                  <line x1="19" y1="12" x2="5" y2="12" />
+                  <polyline points="12 19 5 12 12 5" />
+                </svg>
+                <span className="hidden sm:inline">Back to Home</span>
+                <span className="sm:hidden text-[11px]">Home</span>
+              </Link>
+            )}
+
+            {/* Logo with "Forma Living" */}
+            <Link to="/" className="flex items-center gap-2 group shrink-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl border-2 border-[#2B231D] flex items-center justify-center p-1 sm:p-1.5 transition group-hover:border-[#BD6024]">
+                {/* Armchair Icon */}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 sm:w-5 sm:h-5 text-[#2B231D] group-hover:text-[#BD6024] transition">
+                  <path d="M19 9V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3" />
+                  <path d="M3 11a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5z" />
+                  <path d="M6 18v2" />
+                  <path d="M18 18v2" />
+                  <path d="M4 12v3" />
+                  <path d="M20 12v3" />
+                </svg>
+              </div>
+              <span className={`font-sans font-bold text-lg sm:text-2xl tracking-tight text-[#2B231D] ${location.pathname !== '/' ? 'hidden sm:inline' : ''}`}>
+                Forma Living
+              </span>
+            </Link>
+          </div>
 
           {/* Desktop Navigation Links */}
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-[#6E6359]">
