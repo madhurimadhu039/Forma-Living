@@ -1,13 +1,103 @@
-import { useState, FormEvent } from 'react'
+import { useState, useEffect, FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { products, categoryList, Product } from '../data/products'
 import { useCart } from '../contexts/CartContext'
 
+interface HeroSlide {
+  id: number
+  pillText: string
+  titlePrefix: string
+  titleMid: string
+  highlight: string
+  subtitle: string
+  image: string
+  alt: string
+  category: string
+  link: string
+  caption: string
+}
+
+const HERO_SLIDES: HeroSlide[] = [
+  {
+    id: 0,
+    pillText: 'Living Sanctuary',
+    titlePrefix: 'Stunning &',
+    titleMid: 'Modern',
+    highlight: 'Furniture',
+    subtitle: 'Create your perfect space with our stylish and comfortable designs.',
+    image: '/images/hero-living-room.jpg',
+    alt: 'Stunning & Modern Living Room with Cream Sofa, Armchair, and Coffee Table',
+    category: 'Living Room Collection',
+    link: '/shop?category=Living%20Room',
+    caption: 'Curated Sofas, Lounge Chairs & Tables'
+  },
+  {
+    id: 1,
+    pillText: 'Sleep Sanctuary',
+    titlePrefix: 'Tranquil &',
+    titleMid: 'Restful',
+    highlight: 'Bedrooms',
+    subtitle: 'Discover tranquil solid oak platform beds, linen headboards, and calming accents.',
+    image: '/images/bedroom-banner.jpg',
+    alt: 'Serene Bedroom Sanctuary with Natural Timber Bed and Nightstands',
+    category: 'Bedroom Collection',
+    link: '/shop?category=Bedroom',
+    caption: 'Solid Oak Platform Beds & Belgian Linen'
+  },
+  {
+    id: 2,
+    pillText: 'Dining Sanctuary',
+    titlePrefix: 'Handcrafted &',
+    titleMid: 'Timeless',
+    highlight: 'Dining',
+    subtitle: 'Elevate every meal with solid oak pedestal tables, Italian marble, and cane chairs.',
+    image: '/images/dining-room-banner.jpg',
+    alt: 'Handcrafted Solid Oak Pedestal Dining Table and Woven Cane Chairs',
+    category: 'Dining Room Collection',
+    link: '/shop?category=Dining%20Room',
+    caption: 'Calacatta Marble & FSC Solid Oak Tables'
+  }
+]
+
 export default function Home() {
   const { add, toggleWish, wishlist } = useCart()
   const [activeSlide, setActiveSlide] = useState(0)
+  const [isPaused, setIsPaused] = useState(false)
+  const [touchStart, setTouchStart] = useState<number | null>(null)
+  const [touchEnd, setTouchEnd] = useState<number | null>(null)
   const [newsletterEmail, setNewsletterEmail] = useState('')
   const [newsletterSent, setNewsletterSent] = useState(false)
+
+  // Auto-advance slides every 5.5 seconds unless hovered/interacting
+  useEffect(() => {
+    if (isPaused) return
+    const timer = setInterval(() => {
+      setActiveSlide(prev => (prev + 1) % HERO_SLIDES.length)
+    }, 5500)
+    return () => clearInterval(timer)
+  }, [isPaused])
+
+  const nextSlide = () => setActiveSlide(prev => (prev + 1) % HERO_SLIDES.length)
+  const prevSlide = () => setActiveSlide(prev => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsPaused(true)
+    setTouchEnd(null)
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchEnd = () => {
+    if (touchStart !== null && touchEnd !== null) {
+      const distance = touchStart - touchEnd
+      if (distance > 40) nextSlide()
+      if (distance < -40) prevSlide()
+    }
+    setIsPaused(false)
+  }
 
   // Grab the 4 popular products featured in the reference design
   const popularIds = ['cozy-armchair', 'modern-sofa', 'wooden-table', 'stylish-lamp']
@@ -24,26 +114,38 @@ export default function Home() {
     }
   }
 
+  const currentSlide = HERO_SLIDES[activeSlide]
+
   return (
     <div className="space-y-12 sm:space-y-20 lg:space-y-24">
       {/* 1. HERO SECTION */}
-      <section className="pt-4 sm:pt-10 px-3 sm:px-6">
+      <section
+        className="pt-4 sm:pt-10 px-3 sm:px-6"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
         <div className="mx-auto max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           {/* Left Column: Heading, Subtext, CTA Button & Slider Dots */}
           <div className="lg:col-span-5 flex flex-col justify-center text-center lg:text-left items-center lg:items-start">
+            {/* Pill Tag */}
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FCEEE2] border border-[#BD6024]/20 text-[#BD6024] text-xs font-semibold uppercase tracking-wider mb-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#BD6024] animate-pulse"></span>
+              <span>{currentSlide.pillText}</span>
+            </div>
+
             <h1 className="font-sans font-extrabold text-3xl sm:text-5xl lg:text-[68px] leading-[1.15] sm:leading-[1.08] tracking-tight text-[#2B231D]">
-              Stunning &amp;<br />
-              Modern<br />
-              <span className="text-[#BD6024]">Furniture</span>
+              {currentSlide.titlePrefix}<br />
+              {currentSlide.titleMid}<br />
+              <span className="text-[#BD6024] transition-colors duration-500">{currentSlide.highlight}</span>
             </h1>
 
-            <p className="mt-4 sm:mt-6 text-sm sm:text-lg text-[#6E6359] max-w-md leading-relaxed font-normal">
-              Create your perfect space with our stylish and comfortable designs.
+            <p className="mt-4 sm:mt-6 text-sm sm:text-lg text-[#6E6359] max-w-md leading-relaxed font-normal min-h-[44px] sm:min-h-[56px] transition-opacity duration-300">
+              {currentSlide.subtitle}
             </p>
 
             <div className="mt-6 sm:mt-8">
               <Link
-                to="/shop"
+                to={currentSlide.link}
                 className="inline-flex items-center gap-3 px-6 sm:px-8 py-3 sm:py-4 rounded-2xl bg-[#BD6024] hover:bg-[#a5511c] text-white font-medium text-sm sm:text-base shadow-sm hover:shadow-md transition active:scale-[0.99]"
               >
                 <span>Shop Now</span>
@@ -52,47 +154,108 @@ export default function Home() {
             </div>
 
             {/* Slider Dots Indicator */}
-            <div className="mt-6 sm:mt-10 flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setActiveSlide(0)}
-                aria-label="Slide 1"
-                className={`h-2.5 rounded-full transition-all duration-300 ${
-                  activeSlide === 0 ? 'w-8 bg-[#BD6024]' : 'w-2.5 bg-[#D7CDC1] hover:bg-[#b0a496]'
-                }`}
-              />
-              <button
-                type="button"
-                onClick={() => setActiveSlide(1)}
-                aria-label="Slide 2"
-                className={`h-2.5 rounded-full transition-all duration-300 ${
-                  activeSlide === 1 ? 'w-8 bg-[#BD6024]' : 'w-2.5 bg-[#D7CDC1] hover:bg-[#b0a496]'
-                }`}
-              />
-              <button
-                type="button"
-                onClick={() => setActiveSlide(2)}
-                aria-label="Slide 3"
-                className={`h-2.5 rounded-full transition-all duration-300 ${
-                  activeSlide === 2 ? 'w-8 bg-[#BD6024]' : 'w-2.5 bg-[#D7CDC1] hover:bg-[#b0a496]'
-                }`}
-              />
+            <div className="mt-6 sm:mt-10 flex items-center gap-2.5">
+              {HERO_SLIDES.map((slide, idx) => (
+                <button
+                  key={slide.id}
+                  type="button"
+                  onClick={() => setActiveSlide(idx)}
+                  aria-label={`Slide ${idx + 1}: ${slide.category}`}
+                  aria-current={activeSlide === idx}
+                  className="group flex items-center gap-1.5 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#BD6024] rounded-full p-1 -m-1"
+                >
+                  <span
+                    className={`h-2.5 rounded-full transition-all duration-500 ease-out ${
+                      activeSlide === idx
+                        ? 'w-8 sm:w-10 bg-[#BD6024] shadow-xs'
+                        : 'w-2.5 bg-[#D7CDC1] hover:bg-[#b0a496]'
+                    }`}
+                  />
+                  {activeSlide === idx && (
+                    <span className="text-[11px] font-bold text-[#BD6024] tracking-wider uppercase ml-1 hidden sm:inline">
+                      0{idx + 1}
+                    </span>
+                  )}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Right Column: Hero Living Room Showcase with Arch Backdrop */}
-          <div className="lg:col-span-7 relative flex justify-center w-full">
+          {/* Right Column: Hero Image Carousel with Curved Arch Backdrop */}
+          <div
+            className="lg:col-span-7 relative flex justify-center w-full select-none"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
             {/* Curved Arch Decorative Backdrop */}
-            <div className="relative w-full max-w-md lg:max-w-none">
+            <div className="relative w-full max-w-md lg:max-w-none group">
               <div className="absolute inset-0 top-4 -bottom-4 sm:top-6 sm:-bottom-6 bg-[#EFE8DC]/80 rounded-t-[120px] sm:rounded-t-[180px] rounded-b-[30px] sm:rounded-b-[40px] -z-10 translate-y-2 scale-[1.01]"></div>
 
-              {/* Main Living Room Image */}
-              <div className="relative overflow-hidden rounded-t-[110px] sm:rounded-t-[160px] rounded-b-2xl sm:rounded-b-3xl shadow-lg border-2 sm:border-4 border-white/80 bg-[#FAF7F2]">
-                <img
-                  src="/images/hero-living-room.jpg"
-                  alt="Stunning & Modern Living Room with Cream Sofa, Armchair, and Coffee Table"
-                  className="w-full h-[260px] sm:h-[440px] lg:h-[500px] object-cover hover:scale-105 transition duration-700"
-                />
+              {/* Main Living Room Image Carousel Frame */}
+              <div className="relative overflow-hidden rounded-t-[110px] sm:rounded-t-[160px] rounded-b-2xl sm:rounded-b-3xl shadow-lg border-2 sm:border-4 border-white/80 bg-[#FAF7F2] h-[260px] sm:h-[440px] lg:h-[500px]">
+                {HERO_SLIDES.map((slide, idx) => (
+                  <div
+                    key={slide.id}
+                    className={`absolute inset-0 w-full h-full transition-all duration-700 ease-in-out ${
+                      activeSlide === idx
+                        ? 'opacity-100 scale-100 z-10 pointer-events-auto'
+                        : 'opacity-0 scale-105 pointer-events-none z-0'
+                    }`}
+                  >
+                    <img
+                      src={slide.image}
+                      alt={slide.alt}
+                      className="w-full h-full object-cover"
+                      loading={idx === 0 ? 'eager' : 'lazy'}
+                    />
+                    {/* Subtle Gradient Overlay for Readability */}
+                    <div className="absolute inset-x-0 bottom-0 h-28 sm:h-32 bg-gradient-to-t from-black/65 via-black/25 to-transparent pointer-events-none" />
+
+                    {/* Bottom Floating Info Pill */}
+                    <div className="absolute bottom-3 sm:bottom-5 left-3 sm:left-6 right-3 sm:right-6 flex items-center justify-between pointer-events-auto">
+                      <div className="bg-black/45 backdrop-blur-md border border-white/20 rounded-xl sm:rounded-2xl px-3 sm:px-4 py-1.5 sm:py-2 text-white">
+                        <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#F2DFCE]">
+                          {slide.category}
+                        </p>
+                        <p className="text-xs sm:text-sm font-semibold truncate max-w-[160px] sm:max-w-xs">
+                          {slide.caption}
+                        </p>
+                      </div>
+
+                      <Link
+                        to={slide.link}
+                        className="bg-white/95 hover:bg-white text-[#2B231D] text-xs font-bold px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl shadow-sm transition backdrop-blur-sm shrink-0"
+                      >
+                        Explore →
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+
+                {/* Previous Slide Arrow Button */}
+                <button
+                  type="button"
+                  onClick={prevSlide}
+                  aria-label="Previous slide"
+                  className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/85 hover:bg-white text-[#2B231D] shadow-md flex items-center justify-center transition active:scale-95 group-hover:opacity-100 sm:opacity-80 hover:opacity-100"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 sm:w-5 sm:h-5">
+                    <polyline points="15 18 9 12 15 6" />
+                  </svg>
+                </button>
+
+                {/* Next Slide Arrow Button */}
+                <button
+                  type="button"
+                  onClick={nextSlide}
+                  aria-label="Next slide"
+                  className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/85 hover:bg-white text-[#2B231D] shadow-md flex items-center justify-center transition active:scale-95 group-hover:opacity-100 sm:opacity-80 hover:opacity-100"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 sm:w-5 sm:h-5">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                </button>
               </div>
             </div>
           </div>
