@@ -610,17 +610,6 @@ export default function Home() {
                     <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
                   </svg>
                 </a>
-                <a
-                  href="https://pinterest.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="Pinterest"
-                  className="w-8 h-8 rounded-full bg-[#29221C] text-[#D8CEC4] border border-[#3D332B] flex items-center justify-center hover:bg-[#BD6024] hover:text-white hover:border-[#BD6024] transition shadow-xs"
-                >
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5">
-                    <path d="M12 0a12 12 0 0 0-4.37 23.18c-.03-.98-.05-2.5.05-3.58l.75-3.18s-.19-.38-.19-.94c0-.88.51-1.54 1.15-1.54.54 0 .8.41.8.9 0 .55-.35 1.36-.53 2.12-.15.64.32 1.16.95 1.16 1.14 0 2.02-1.2 2.02-2.93 0-1.53-1.1-2.6-2.67-2.6-1.95 0-3.09 1.46-3.09 2.97 0 .59.23 1.22.51 1.57.06.07.07.13.05.2l-.19.78c-.03.13-.1.16-.23.1-1.04-.48-1.69-2-1.69-3.22 0-2.62 1.9-5.03 5.49-5.03 2.88 0 5.12 2.05 5.12 4.8 0 2.86-1.8 5.16-4.3 5.16-.84 0-1.63-.44-1.9-.95l-.52 1.98c-.19.72-.7 1.62-1.04 2.18A12 12 0 1 0 12 0z" />
-                  </svg>
-                </a>
               </div>
             </div>
 
