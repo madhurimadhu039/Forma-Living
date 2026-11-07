@@ -4,16 +4,10 @@ import { useAuth } from '../contexts/AuthContext'
 import { useCart } from '../contexts/CartContext'
 
 export function Layout() {
-  const { user, login, register, reset, logout } = useAuth()
+  const { user, logout } = useAuth()
   const { lines, wishlist } = useCart()
-  const [accountOpen, setAccountOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
-  const [authMode, setAuthMode] = useState<'in' | 'up'>('in')
-  const [authEmail, setAuthEmail] = useState('')
-  const [authPw, setAuthPw] = useState('')
-  const [authMsg, setAuthMsg] = useState('')
-  const [authLoading, setAuthLoading] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -25,39 +19,6 @@ export function Layout() {
     if (searchQuery.trim()) {
       navigate(`/shop?q=${encodeURIComponent(searchQuery.trim())}`)
       setSearchOpen(false)
-    }
-  }
-
-  const handleAuthSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setAuthMsg('')
-    setAuthLoading(true)
-    try {
-      if (authMode === 'in') {
-        await login(authEmail, authPw)
-      } else {
-        await register(authEmail, authPw)
-      }
-      setAuthEmail('')
-      setAuthPw('')
-      setAccountOpen(false)
-    } catch (err: any) {
-      setAuthMsg(String(err.code || err.message || 'Authentication error').replace('auth/', '').replace(/-/g, ' '))
-    } finally {
-      setAuthLoading(false)
-    }
-  }
-
-  const handleResetPassword = async () => {
-    if (!authEmail.trim()) {
-      setAuthMsg('Please enter your email above to reset password.')
-      return
-    }
-    try {
-      await reset(authEmail.trim())
-      setAuthMsg('Password reset email sent! Check your inbox.')
-    } catch (err: any) {
-      setAuthMsg(String(err.code || err.message || 'Error sending reset email').replace('auth/', '').replace(/-/g, ' '))
     }
   }
 
@@ -147,25 +108,55 @@ export function Layout() {
               )}
             </Link>
 
-            {/* Sign In / User Account Section Button */}
-            <button
-              onClick={() => {
-                setAccountOpen(!accountOpen)
-                setSearchOpen(false)
-              }}
-              aria-label="Sign In / User Account"
-              className={`h-9 sm:h-10 px-2.5 sm:px-3 rounded-full border border-[#E7DFD5] bg-white flex items-center gap-1.5 text-[#2B231D] hover:bg-[#FCEEE2] hover:border-[#BD6024]/40 transition shadow-2xs ${
-                accountOpen ? 'bg-[#FCEEE2] border-[#BD6024]/60 text-[#BD6024]' : ''
-              }`}
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-[#BD6024]">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-              </svg>
-              <span className="text-xs font-semibold text-[#2B231D] hidden min-[440px]:inline">
-                {user ? (user.email?.split('@')[0] || 'Account') : 'Sign In'}
-              </span>
-            </button>
+            {/* Sign In Navigation Link */}
+            {user ? (
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <Link
+                  to="/login"
+                  aria-label="Account Overview"
+                  className={`h-9 sm:h-10 px-2.5 sm:px-3 rounded-full border border-[#E7DFD5] bg-white flex items-center gap-1.5 text-[#2B231D] hover:bg-[#FCEEE2] hover:border-[#BD6024]/40 transition shadow-2xs ${
+                    isActive('/login') ? 'bg-[#FCEEE2] border-[#BD6024]/60 text-[#BD6024]' : ''
+                  }`}
+                  title={user.email || 'Account'}
+                >
+                  <div className="w-5 h-5 rounded-full bg-[#BD6024] text-white flex items-center justify-center text-[10px] font-bold">
+                    {user.email?.charAt(0).toUpperCase() || 'U'}
+                  </div>
+                  <span className="text-xs font-semibold text-[#2B231D] hidden min-[520px]:inline truncate max-w-[110px]">
+                    {user.email?.split('@')[0]}
+                  </span>
+                </Link>
+                <button
+                  onClick={() => logout()}
+                  aria-label="Sign Out"
+                  className="h-9 sm:h-10 px-2.5 sm:px-3 rounded-full border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-semibold transition shadow-2xs flex items-center gap-1"
+                  title="Sign Out"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
+                  </svg>
+                  <span className="hidden min-[600px]:inline">Sign Out</span>
+                </button>
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                aria-label="Sign In"
+                className={`h-9 sm:h-10 px-2.5 sm:px-3.5 rounded-full border border-[#E7DFD5] bg-white flex items-center gap-1.5 text-[#2B231D] hover:bg-[#FCEEE2] hover:border-[#BD6024]/40 transition shadow-2xs ${
+                  isActive('/login') ? 'bg-[#FCEEE2] border-[#BD6024]/60 text-[#BD6024]' : ''
+                }`}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-[#BD6024]">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+                <span className="text-xs font-semibold text-[#2B231D] hidden min-[440px]:inline">
+                  Sign In
+                </span>
+              </Link>
+            )}
           </div>
         </div>
 
@@ -199,186 +190,6 @@ export function Layout() {
                 ✕
               </button>
             </form>
-          </div>
-        )}
-
-        {/* Sign In / Account Section (Properly styled without navbar links or category grid) */}
-        {accountOpen && (
-          <div className="border-t border-[#EFE8DC] bg-white px-4 sm:px-6 py-6 shadow-xl animate-in fade-in duration-200">
-            <div className="mx-auto max-w-md">
-              {user ? (
-                // When logged in: Profile & Account Overview
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between pb-3 border-b border-[#EFE8DC]">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-[#FCEEE2] text-[#BD6024] font-bold flex items-center justify-center text-sm border border-[#BD6024]/30">
-                        {user.email?.charAt(0).toUpperCase() || 'U'}
-                      </div>
-                      <div>
-                        <p className="text-xs text-[#82756A]">Signed in as</p>
-                        <p className="font-semibold text-sm text-[#2B231D] truncate max-w-[200px]">{user.email}</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => setAccountOpen(false)}
-                      className="p-1.5 text-[#82756A] hover:text-[#2B231D] rounded-lg text-sm"
-                      aria-label="Close"
-                    >
-                      ✕
-                    </button>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2.5 pt-1 text-xs">
-                    <Link
-                      to="/cart"
-                      onClick={() => setAccountOpen(false)}
-                      className="p-3 rounded-xl bg-[#FAF7F2] border border-[#EFE8DC] hover:border-[#BD6024]/40 hover:bg-[#FCEEE2] transition flex items-center justify-between"
-                    >
-                      <span className="font-medium text-[#2B231D]">Shopping Bag</span>
-                      <span className="font-bold text-[#BD6024]">{totalCartCount}</span>
-                    </Link>
-                    <Link
-                      to="/shop"
-                      onClick={() => setAccountOpen(false)}
-                      className="p-3 rounded-xl bg-[#FAF7F2] border border-[#EFE8DC] hover:border-[#BD6024]/40 hover:bg-[#FCEEE2] transition flex items-center justify-between"
-                    >
-                      <span className="font-medium text-[#2B231D]">Wishlist</span>
-                      <span className="font-bold text-[#BD6024]">{totalWishCount}</span>
-                    </Link>
-                  </div>
-
-                  <button
-                    onClick={async () => {
-                      await logout()
-                      setAccountOpen(false)
-                    }}
-                    className="w-full py-2.5 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-semibold transition"
-                  >
-                    Sign Out
-                  </button>
-                </div>
-              ) : (
-                // When logged out: Proper Sign In Section
-                <div>
-                  <div className="flex items-center justify-between pb-3 mb-4 border-b border-[#EFE8DC]">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-xl bg-[#FCEEE2] text-[#BD6024] flex items-center justify-center">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                          <circle cx="12" cy="7" r="4" />
-                        </svg>
-                      </div>
-                      <div>
-                        <h3 className="font-sans font-bold text-sm text-[#2B231D]">
-                          {authMode === 'in' ? 'Sign In to Your Account' : 'Create an Account'}
-                        </h3>
-                        <p className="text-[11px] text-[#82756A]">
-                          {authMode === 'in' ? 'Save favorites & track orders' : 'Join Forma Living today'}
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => setAccountOpen(false)}
-                      className="p-1.5 text-[#82756A] hover:text-[#2B231D] rounded-lg text-sm"
-                      aria-label="Close"
-                    >
-                      ✕
-                    </button>
-                  </div>
-
-                  {/* Mode Tabs */}
-                  <div className="flex rounded-xl bg-[#FAF7F2] p-1 mb-4 border border-[#EFE8DC]">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setAuthMode('in')
-                        setAuthMsg('')
-                      }}
-                      className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition ${
-                        authMode === 'in' ? 'bg-white text-[#2B231D] shadow-xs' : 'text-[#82756A] hover:text-[#2B231D]'
-                      }`}
-                    >
-                      Sign In
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setAuthMode('up')
-                        setAuthMsg('')
-                      }}
-                      className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition ${
-                        authMode === 'up' ? 'bg-white text-[#2B231D] shadow-xs' : 'text-[#82756A] hover:text-[#2B231D]'
-                      }`}
-                    >
-                      Register
-                    </button>
-                  </div>
-
-                  <form onSubmit={handleAuthSubmit} className="space-y-3">
-                    <div>
-                      <label className="block text-[11px] font-semibold text-[#6E6359] mb-1">Email Address</label>
-                      <input
-                        type="email"
-                        required
-                        placeholder="you@example.com"
-                        value={authEmail}
-                        onChange={e => setAuthEmail(e.target.value)}
-                        className="w-full bg-[#FAF7F2] border border-[#EFE8DC] rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-[#BD6024]"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[11px] font-semibold text-[#6E6359] mb-1">Password</label>
-                      <input
-                        type="password"
-                        required
-                        minLength={8}
-                        placeholder="8+ characters"
-                        value={authPw}
-                        onChange={e => setAuthPw(e.target.value)}
-                        className="w-full bg-[#FAF7F2] border border-[#EFE8DC] rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-[#BD6024]"
-                      />
-                    </div>
-
-                    {authMsg && (
-                      <p className="p-2.5 rounded-xl bg-red-50 text-red-700 text-[11px] text-center capitalize">
-                        {authMsg}
-                      </p>
-                    )}
-
-                    <button
-                      type="submit"
-                      disabled={authLoading}
-                      className="w-full py-2.5 rounded-xl bg-[#BD6024] hover:bg-[#a5511c] disabled:opacity-50 text-white font-semibold text-xs shadow-sm transition"
-                    >
-                      {authLoading ? 'Please wait…' : authMode === 'in' ? 'Sign In' : 'Create Account'}
-                    </button>
-
-                    <div className="pt-2 flex items-center justify-between text-[11px] text-[#82756A]">
-                      {authMode === 'in' ? (
-                        <button
-                          type="button"
-                          onClick={handleResetPassword}
-                          className="hover:text-[#BD6024] underline"
-                        >
-                          Forgot password?
-                        </button>
-                      ) : (
-                        <span>Free delivery on orders over $300</span>
-                      )}
-
-                      <Link
-                        to="/login"
-                        onClick={() => setAccountOpen(false)}
-                        className="text-[#BD6024] font-medium hover:underline"
-                      >
-                        Full page login →
-                      </Link>
-                    </div>
-                  </form>
-                </div>
-              )}
-            </div>
           </div>
         )}
       </header>
