@@ -1,17 +1,25 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { products } from '../data/products'
+import { useProducts } from '../contexts/ProductContext'
 import { useCart } from '../contexts/CartContext'
 import { ProductCard } from './Shop'
 import { formatPrice } from '../utils/format'
 
 export default function ProductPage() {
   const { id } = useParams()
-  const p = products.find(x => x.id === id)
+  const { getProductById, products, loading } = useProducts()
+  const p = getProductById(id || '')
   const { add, toggleWish, wishlist } = useCart()
   const [addedNote, setAddedNote] = useState(false)
 
   if (!p) {
+    if (loading) {
+      return (
+        <div className="mx-auto max-w-4xl px-4 py-24 text-center">
+          <p className="text-sm font-medium text-[#82756A] animate-pulse">Loading piece details…</p>
+        </div>
+      )
+    }
     return (
       <div className="mx-auto max-w-4xl px-4 py-24 text-center">
         <h1 className="text-3xl font-bold text-[#2B231D]">Product not found</h1>

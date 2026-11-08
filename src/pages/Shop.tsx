@@ -1,5 +1,5 @@
 import { Link, useSearchParams } from 'react-router-dom'
-import { categories, products, Product } from '../data/products'
+import { useProducts, Product, categories } from '../contexts/ProductContext'
 import { useCart } from '../contexts/CartContext'
 import { formatPrice } from '../utils/format'
 
@@ -77,6 +77,7 @@ export function ProductCard({ p }: { p: Product }) {
 }
 
 export default function Shop() {
+  const { products, loading, error } = useProducts()
   const [sp, setSp] = useSearchParams()
   const cat = sp.get('category') || ''
   const q = (sp.get('q') || '').toLowerCase()
@@ -153,7 +154,7 @@ export default function Shop() {
             <div className="mt-3 sm:mt-4 flex flex-wrap gap-1.5 sm:gap-2 text-[10px] sm:text-[11px]">
               <span className="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/25">16 Unique Pieces</span>
               <span className="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/25">FSC Solid Timber</span>
-              <span className="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/25">Free Delivery Over $300</span>
+              <span className="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/25">Free Delivery Over ₹5,000</span>
             </div>
           </div>
         </div>

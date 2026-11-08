@@ -1,7 +1,17 @@
 node_modules
 dist
 .env
+.env.*
 .env.local
 .vercel
 functions/.env
+functions/.env.*
+functions/.secret.local
+*.secret.local
+*service-account*.json
+*serviceAccount*.json
+*.key.json
 functions/lib
+.firebase
+scratch
+

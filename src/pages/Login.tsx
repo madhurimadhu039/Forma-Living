@@ -8,6 +8,7 @@ export default function Login() {
   const { lines, wishlist } = useCart()
   const nav = useNavigate()
   const [mode, setMode] = useState<'in' | 'up'>('in')
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [pw, setPw] = useState('')
   const [showPw, setShowPw] = useState(false)
@@ -26,7 +27,7 @@ export default function Login() {
       if (mode === 'in') {
         await login(email, pw)
       } else {
-        await register(email, pw)
+        await register(email, pw, name)
       }
       nav('/')
     } catch (err: any) {
@@ -99,7 +100,7 @@ export default function Login() {
                 <span className="font-semibold text-[#2B231D] group-hover:text-[#BD6024]">Shopping Bag</span>
               </Link>
               <Link
-                to="/shop"
+                to="/wishlist"
                 className="p-3.5 rounded-xl bg-[#FAF7F2] border border-[#EFE8DC] hover:border-[#BD6024]/40 hover:bg-[#FCEEE2] transition flex flex-col items-center justify-center gap-1 group"
               >
                 <span className="font-bold text-base sm:text-lg text-[#BD6024]">{totalWishCount}</span>
@@ -185,6 +186,23 @@ export default function Login() {
             </div>
 
             <form onSubmit={submit} className="space-y-4">
+              {mode === 'up' && (
+                <div>
+                  <label className="block text-xs font-semibold text-[#6E6359] mb-1.5">Full Name</label>
+                  <div className="relative">
+                    <input
+                      className="w-full bg-[#FAF7F2] border border-[#EFE8DC] rounded-xl pl-9 pr-4 py-2.5 sm:py-3 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#BD6024]"
+                      type="text"
+                      required
+                      placeholder="Jane Doe"
+                      value={name}
+                      onChange={e => setName(e.target.value)}
+                    />
+                    <span className="absolute left-3 top-3 text-[#82756A] text-xs">👤</span>
+                  </div>
+                </div>
+              )}
+
               <div>
                 <label className="block text-xs font-semibold text-[#6E6359] mb-1.5">Email Address</label>
                 <div className="relative">

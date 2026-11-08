@@ -1,7 +1,8 @@
 import { useState, useEffect, FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { products, categoryList, Product } from '../data/products'
+import { useProducts, Product } from '../contexts/ProductContext'
 import { useCart } from '../contexts/CartContext'
+import { formatPrice } from '../utils/format'
 
 interface HeroSlide {
   id: number
@@ -60,6 +61,7 @@ const HERO_SLIDES: HeroSlide[] = [
 ]
 
 export default function Home() {
+  const { products, categoryList } = useProducts()
   const { add, toggleWish, wishlist } = useCart()
   const [activeSlide, setActiveSlide] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
@@ -368,7 +370,7 @@ export default function Home() {
 
                   <div className="mt-2 pt-1 flex items-center justify-between gap-1">
                     <span className="font-bold text-[#BD6024] text-xs sm:text-base">
-                      ${product.price}
+                      {formatPrice(product.price)}
                     </span>
 
                     <div className="flex items-center gap-1 sm:gap-2">

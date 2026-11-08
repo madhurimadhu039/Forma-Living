@@ -4,16 +4,11 @@ import Home from './pages/Home'
 import Shop from './pages/Shop'
 import ProductPage from './pages/Product'
 import Cart from './pages/Cart'
+import Wishlist from './pages/Wishlist'
 import Login from './pages/Login'
 import About from './pages/About'
 import Contact from './pages/Contact'
-
-const Admin = () => (
-  <div className="mx-auto max-w-4xl p-10">
-    <h1 className="font-sans font-bold text-3xl text-[#2B231D]">Admin Dashboard</h1>
-    <p className="mt-2 text-[#82756A]">Access requires the Firebase custom claim admin=true.</p>
-  </div>
-)
+import Admin from './pages/Admin'
 
 const Privacy = () => (
   <div className="mx-auto max-w-4xl px-4 py-16">
@@ -41,6 +36,7 @@ export default function App() {
         <Route path="shop" element={<Shop />} />
         <Route path="product/:id" element={<ProductPage />} />
         <Route path="cart" element={<Cart />} />
+        <Route path="wishlist" element={<Wishlist />} />
         <Route path="login" element={<Login />} />
         <Route path="about" element={<About />} />
         <Route path="contact" element={<Contact />} />

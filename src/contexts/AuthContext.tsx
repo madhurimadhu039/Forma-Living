@@ -1,13 +1,14 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
-import { User, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signOut } from 'firebase/auth'
-import { auth } from '../config/firebase'
+import { User, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signOut, updateProfile } from 'firebase/auth'
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
+import { auth, db } from '../config/firebase'
 
 interface Ctx {
   user: User | null
   isAdmin: boolean
   loading: boolean
   login: (e: string, p: string) => Promise<void>
-  register: (e: string, p: string) => Promise<void>
+  register: (e: string, p: string, name?: string) => Promise<void>
   reset: (e: string) => Promise<void>
   logout: () => Promise<void>
 }
@@ -52,9 +53,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAdmin,
         loading,
         login: async (e, p) => { await signInWithEmailAndPassword(auth, e, p) },
-        register: async (e, p) => {
+        register: async (e, p, name?: string) => {
           const c = await createUserWithEmailAndPassword(auth, e, p)
-          await sendEmailVerification(c.user)
+          const customerName = name?.trim() || e.split('@')[0]
+
+          try {
+            const userRef = doc(db, 'users', c.user.uid)
+            const userSnap = await getDoc(userRef)
+            if (!userSnap.exists()) {
+              await setDoc(userRef, {
+                uid: c.user.uid,
+                name: customerName,
+                email: c.user.email || e,
+                createdAt: serverTimestamp(),
+              })
+            }
+          } catch (err) {
+            console.warn('Firestore user profile creation notice:', err)
+          }
+
+          try {
+            await updateProfile(c.user, { displayName: customerName })
+          } catch (err) {
+            console.warn('Auth profile update notice:', err)
+          }
+
+          try {
+            await sendEmailVerification(c.user)
+          } catch (err) {
+            console.warn('Email verification dispatch notice:', err)
+          }
         },
         reset: e => sendPasswordResetEmail(auth, e),
         logout: () => signOut(auth)

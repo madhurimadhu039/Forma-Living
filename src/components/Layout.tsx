@@ -76,9 +76,11 @@ export function Layout() {
 
             {/* Wishlist Link (Accessible on both mobile and desktop) */}
             <Link
-              to="/shop"
+              to="/wishlist"
               aria-label="Wishlist"
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-[#E7DFD5] bg-white flex items-center justify-center text-[#2B231D] hover:bg-[#FCEEE2] hover:border-[#BD6024]/40 transition relative shadow-2xs"
+              className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-[#E7DFD5] bg-white flex items-center justify-center text-[#2B231D] hover:bg-[#FCEEE2] hover:border-[#BD6024]/40 transition relative shadow-2xs ${
+                isActive('/wishlist') ? 'bg-[#FCEEE2] border-[#BD6024]/60 text-[#BD6024]' : ''
+              }`}
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
                 <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
@@ -250,8 +252,10 @@ export function Layout() {
 
         {/* Wishlist */}
         <Link
-          to="/shop"
-          className="flex flex-col items-center justify-center py-1 px-3 rounded-xl text-[#82756A] hover:text-[#2B231D] relative transition"
+          to="/wishlist"
+          className={`flex flex-col items-center justify-center py-1 px-3 rounded-xl relative transition ${
+            isActive('/wishlist') ? 'text-[#BD6024]' : 'text-[#82756A] hover:text-[#2B231D]'
+          }`}
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
             <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
