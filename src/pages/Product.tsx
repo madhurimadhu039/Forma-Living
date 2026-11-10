@@ -35,9 +35,11 @@ export default function ProductPage() {
   const related = products.filter(x => x.category === p.category && x.id !== p.id).slice(0, 4)
 
   const handleAdd = () => {
-    add(p.id)
-    setAddedNote(true)
-    setTimeout(() => setAddedNote(false), 2500)
+    const success = add(p.id, p.name, p.stock)
+    if (success) {
+      setAddedNote(true)
+      setTimeout(() => setAddedNote(false), 2500)
+    }
   }
 
   return (

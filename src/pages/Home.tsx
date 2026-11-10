@@ -376,11 +376,12 @@ export default function Home() {
                     <div className="flex items-center gap-1 sm:gap-2">
                       <button
                         type="button"
-                        onClick={() => add(product.id)}
-                        className="text-[10px] sm:text-xs bg-[#FAF7F2] hover:bg-[#BD6024] text-[#2B231D] hover:text-white font-medium px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg border border-[#EFE8DC] transition"
-                        title="Add to Cart"
+                        disabled={product.stock < 1}
+                        onClick={() => add(product.id, product.name, product.stock)}
+                        className="text-[10px] sm:text-xs bg-[#FAF7F2] hover:bg-[#BD6024] text-[#2B231D] hover:text-white disabled:opacity-40 font-medium px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg border border-[#EFE8DC] transition"
+                        title={product.stock < 1 ? 'Out of stock' : 'Add to Cart'}
                       >
-                        + Cart
+                        {product.stock < 1 ? 'Sold' : '+ Cart'}
                       </button>
 
                       <button

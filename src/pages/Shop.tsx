@@ -42,7 +42,7 @@ export function ProductCard({ p }: { p: Product }) {
           <button
             type="button"
             disabled={p.stock < 1}
-            onClick={() => add(p.id)}
+            onClick={() => add(p.id, p.name, p.stock)}
             className="text-[10px] sm:text-xs bg-[#FAF7F2] hover:bg-[#BD6024] text-[#2B231D] hover:text-white disabled:opacity-40 font-medium px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg border border-[#EFE8DC] transition"
           >
             {p.stock < 1 ? 'Sold' : '+ Cart'}

@@ -15,7 +15,7 @@ export default function Wishlist() {
   const handleAddAllToCart = () => {
     savedProducts.forEach(p => {
       if (p.stock > 0) {
-        add(p.id)
+        add(p.id, p.name, p.stock)
       }
     })
   }

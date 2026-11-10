@@ -30,3 +30,46 @@ body {
 .btn {
   @apply inline-flex items-center justify-center rounded-md bg-ink px-6 py-3 text-sm font-medium text-ivory transition hover:bg-walnut disabled:opacity-50;
 }
+
+/* Subtle Cart Icon Animation */
+@keyframes cart-bump {
+  0% {
+    transform: scale(1);
+  }
+  20% {
+    transform: scale(1.18) rotate(-6deg);
+  }
+  40% {
+    transform: scale(0.96) rotate(3deg);
+  }
+  60% {
+    transform: scale(1.08) rotate(-1deg);
+  }
+  80% {
+    transform: scale(0.98) rotate(0);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+
+.animate-cart-bump {
+  animation: cart-bump 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes badge-pop {
+  0% {
+    transform: scale(0.75);
+  }
+  50% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-badge-pop {
+  animation: badge-pop 0.35s ease-out;
+}
+

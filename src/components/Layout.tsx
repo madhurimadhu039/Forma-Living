@@ -5,7 +5,7 @@ import { useCart } from '../contexts/CartContext'
 
 export function Layout() {
   const { user, logout } = useAuth()
-  const { lines, wishlist } = useCart()
+  const { lines, wishlist, toast, dismissToast, cartAnimating } = useCart()
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const navigate = useNavigate()
@@ -96,15 +96,30 @@ export function Layout() {
             <Link
               to="/cart"
               aria-label="Cart"
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-[#E7DFD5] bg-white flex items-center justify-center text-[#2B231D] hover:bg-[#FCEEE2] hover:border-[#BD6024]/40 transition relative shadow-2xs"
+              className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-[#E7DFD5] bg-white flex items-center justify-center text-[#2B231D] hover:bg-[#FCEEE2] hover:border-[#BD6024]/40 transition relative shadow-2xs ${
+                cartAnimating ? 'animate-cart-bump border-[#BD6024] text-[#BD6024]' : ''
+              }`}
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={`w-4 h-4 transition-colors ${cartAnimating ? 'text-[#BD6024]' : ''}`}
+              >
                 <circle cx="9" cy="21" r="1" />
                 <circle cx="20" cy="21" r="1" />
                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
               </svg>
               {totalCartCount > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] sm:min-w-[18px] sm:h-[18px] px-1 bg-[#BD6024] text-white rounded-full text-[9px] sm:text-[10px] font-bold flex items-center justify-center shadow-xs">
+                <span
+                  key={totalCartCount}
+                  className={`absolute -top-1 -right-1 min-w-[16px] h-[16px] sm:min-w-[18px] sm:h-[18px] px-1 bg-[#BD6024] text-white rounded-full text-[9px] sm:text-[10px] font-bold flex items-center justify-center shadow-xs ${
+                    cartAnimating ? 'animate-badge-pop scale-110' : ''
+                  }`}
+                >
                   {totalCartCount}
                 </span>
               )}
@@ -271,23 +286,94 @@ export function Layout() {
         {/* Cart */}
         <Link
           to="/cart"
+          aria-label="Cart"
           className={`flex flex-col items-center justify-center py-1 px-3 rounded-xl relative transition ${
             isActive('/cart') ? 'text-[#BD6024]' : 'text-[#82756A] hover:text-[#2B231D]'
-          }`}
+          } ${cartAnimating ? 'animate-cart-bump' : ''}`}
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={`w-5 h-5 transition-colors ${cartAnimating ? 'text-[#BD6024]' : ''}`}
+          >
             <circle cx="9" cy="21" r="1" />
             <circle cx="20" cy="21" r="1" />
             <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
           </svg>
           {totalCartCount > 0 && (
-            <span className="absolute top-0.5 right-2 min-w-[14px] h-[14px] px-0.5 bg-[#BD6024] text-white rounded-full text-[8px] font-bold flex items-center justify-center">
+            <span
+              key={totalCartCount}
+              className={`absolute top-0.5 right-2 min-w-[14px] h-[14px] px-0.5 bg-[#BD6024] text-white rounded-full text-[8px] font-bold flex items-center justify-center ${
+                cartAnimating ? 'animate-badge-pop scale-110' : ''
+              }`}
+            >
               {totalCartCount}
             </span>
           )}
           <span className="text-[10px] font-medium mt-0.5">Cart</span>
         </Link>
       </nav>
+
+      {/* Floating Success Toast Notification */}
+      {toast && (
+        <aside
+          role="status"
+          aria-live="polite"
+          className="fixed top-16 sm:top-20 right-3 sm:right-6 left-3 sm:left-auto sm:max-w-md z-50 pointer-events-auto"
+        >
+          <div className="bg-[#2B231D] text-white p-3 sm:p-4 rounded-2xl shadow-2xl border border-[#43372E] flex items-center justify-between gap-3 backdrop-blur-md animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#BD6024] text-white flex items-center justify-center shrink-0">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-4 h-4"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-white truncate">
+                  <span className="font-bold text-[#F2DFCE]">{toast.productName}</span> added to your cart
+                </p>
+                <p className="text-[10px] sm:text-[11px] text-[#D7CDC1]">
+                  Ready for checkout
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+              <Link
+                to="/cart"
+                onClick={dismissToast}
+                className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#BD6024] hover:bg-[#a5511c] text-white text-xs font-semibold transition shadow-xs flex items-center gap-1"
+              >
+                <span>View Bag</span>
+                <span className="text-[10px]">→</span>
+              </Link>
+              <button
+                type="button"
+                onClick={dismissToast}
+                aria-label="Close notification"
+                className="p-1 rounded-lg text-[#D7CDC1] hover:text-white hover:bg-white/10 transition"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 sm:w-4 sm:h-4">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </aside>
+      )}
     </div>
   )
 }
