@@ -2,10 +2,12 @@ import { FormEvent, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useCart } from '../contexts/CartContext'
+import { useProducts } from '../contexts/ProductContext'
 
 export default function Login() {
-  const { user, login, register, reset, logout } = useAuth()
+  const { user, isAdmin, login, register, reset, logout } = useAuth()
   const { lines, wishlist } = useCart()
+  const { getProductById } = useProducts()
   const nav = useNavigate()
   const [mode, setMode] = useState<'in' | 'up'>('in')
   const [name, setName] = useState('')
@@ -17,7 +19,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false)
 
   const totalCartCount = lines.reduce((s, l) => s + l.qty, 0)
-  const totalWishCount = wishlist.length
+  const totalWishCount = wishlist.filter(id => Boolean(getProductById(id))).length
 
   async function submit(e: FormEvent) {
     e.preventDefault()
@@ -109,6 +111,14 @@ export default function Login() {
             </div>
 
             <div className="flex flex-col gap-2.5 pt-2">
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  className="w-full py-2.5 rounded-xl border border-[#BD6024]/40 bg-[#FCEEE2] hover:bg-[#f7dec8] text-[#BD6024] font-semibold text-xs sm:text-sm transition"
+                >
+                  Open Admin Dashboard
+                </Link>
+              )}
               <Link
                 to="/shop"
                 className="w-full py-3 rounded-xl bg-[#BD6024] hover:bg-[#a5511c] text-white font-semibold text-xs sm:text-sm transition shadow-sm"

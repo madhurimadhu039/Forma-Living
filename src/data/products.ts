@@ -15,6 +15,7 @@ export interface Product {
   image: string
   images?: string[]
   isPopular?: boolean
+  archived?: boolean
 }
 
 export interface CategoryInfo {

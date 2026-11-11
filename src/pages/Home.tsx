@@ -101,11 +101,17 @@ export default function Home() {
     setIsPaused(false)
   }
 
-  // Grab the 4 popular products featured in the reference design
-  const popularIds = ['cozy-armchair', 'modern-sofa', 'wooden-table', 'stylish-lamp']
-  const popularProducts = popularIds
-    .map(id => products.find(p => p.id === id))
+  // Showcase up to 4 active popular products, preferring the signature 4 when active & marked popular
+  const preferredPopularIds = ['cozy-armchair', 'modern-sofa', 'wooden-table', 'stylish-lamp']
+  const preferredPopular = preferredPopularIds
+    .map(id => products.find(p => p.id === id && Boolean(p.isPopular)))
     .filter((p): p is Product => Boolean(p))
+  const seenPopularIds = new Set(preferredPopular.map(p => p.id))
+  const additionalPopular = products.filter(
+    p => Boolean(p.isPopular) && !seenPopularIds.has(p.id)
+  )
+  const fallbackActive = products.filter(p => !p.isPopular && !seenPopularIds.has(p.id))
+  const popularProducts = [...preferredPopular, ...additionalPopular, ...fallbackActive].slice(0, 4)
 
   const handleNewsletter = (e: FormEvent) => {
     e.preventDefault()

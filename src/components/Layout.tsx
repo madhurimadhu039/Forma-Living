@@ -2,17 +2,19 @@ import { useState } from 'react'
 import { Link, Outlet, Navigate, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useCart } from '../contexts/CartContext'
+import { useProducts } from '../contexts/ProductContext'
 
 export function Layout() {
   const { user, logout } = useAuth()
   const { lines, wishlist, toast, dismissToast, cartAnimating } = useCart()
+  const { getProductById } = useProducts()
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const navigate = useNavigate()
   const location = useLocation()
 
   const totalCartCount = lines.reduce((s, l) => s + l.qty, 0)
-  const totalWishCount = wishlist.length
+  const totalWishCount = wishlist.filter(id => Boolean(getProductById(id))).length
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault()

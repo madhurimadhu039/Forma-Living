@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useProducts } from '../contexts/ProductContext'
 import { useCart } from '../contexts/CartContext'
 import { ProductCard } from './Shop'
 import { formatPrice } from '../utils/format'
+import { normalizeProductImages } from '../services/adminProducts'
 
 export default function ProductPage() {
   const { id } = useParams()
@@ -11,6 +12,20 @@ export default function ProductPage() {
   const p = getProductById(id || '')
   const { add, toggleWish, wishlist } = useCart()
   const [addedNote, setAddedNote] = useState(false)
+  const rawGalleryKey = p
+    ? `${p.image}::${Array.isArray(p.images) ? p.images.join('|') : ''}`
+    : ''
+
+  const gallery = useMemo(() => {
+    if (!p) return []
+    return normalizeProductImages(p.image, p.images && p.images.length > 0 ? p.images : [p.image])
+      .images
+  }, [p?.id, rawGalleryKey])
+  const [selectedImage, setSelectedImage] = useState('')
+
+  useEffect(() => {
+    setSelectedImage(gallery[0] || '')
+  }, [p?.id, rawGalleryKey])
 
   if (!p) {
     if (loading) {
@@ -68,11 +83,15 @@ export default function ProductPage() {
 
       {/* Product Main Showcase */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-10 lg:gap-14">
-        {/* Left: Product Image */}
-        <div className="lg:col-span-7">
+        {/* Left: Product Image Gallery */}
+        <div className="lg:col-span-7 space-y-3">
           <div className="aspect-[4/3] sm:aspect-[4/3.5] rounded-2xl sm:rounded-3xl overflow-hidden bg-white shadow-sm border border-[#EFE8DC]">
             <img
-              src={p.image}
+              src={
+                selectedImage && gallery.includes(selectedImage)
+                  ? selectedImage
+                  : gallery[0] || p.image
+              }
               alt={p.name}
               className="w-full h-full object-cover"
               onError={e => {
@@ -80,6 +99,39 @@ export default function ProductPage() {
               }}
             />
           </div>
+
+          {gallery.length > 1 && (
+            <div className="grid grid-cols-4 sm:grid-cols-5 gap-2.5 sm:gap-3">
+              {gallery.map((imgUrl, idx) => {
+                const isSelected =
+                  (selectedImage && gallery.includes(selectedImage)
+                    ? selectedImage
+                    : gallery[0]) === imgUrl
+                return (
+                  <button
+                    key={`${imgUrl}-${idx}`}
+                    type="button"
+                    onClick={() => setSelectedImage(imgUrl)}
+                    aria-label={`View image ${idx + 1} of ${p.name}`}
+                    className={`aspect-[4/3] rounded-xl overflow-hidden bg-white border transition ${
+                      isSelected
+                        ? 'border-[#BD6024] ring-2 ring-[#BD6024]/30'
+                        : 'border-[#EFE8DC] hover:border-[#BD6024]/60 opacity-80 hover:opacity-100'
+                    }`}
+                  >
+                    <img
+                      src={imgUrl}
+                      alt={`${p.name} thumbnail ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                      onError={e => {
+                        e.currentTarget.src = '/images/hero-living-room.jpg'
+                      }}
+                    />
+                  </button>
+                )
+              })}
+            </div>
+          )}
         </div>
 
         {/* Right: Info & Purchase Controls */}
