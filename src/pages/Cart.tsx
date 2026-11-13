@@ -405,18 +405,22 @@ export default function Cart() {
                       Remove
                     </button>
                   ) : (
-                    <div className="flex items-center gap-1 sm:gap-2 bg-[#FAF7F2] rounded-xl px-1.5 sm:px-2 py-1 border border-[#EFE8DC] shrink-0">
+                    <div className="flex items-center gap-1 sm:gap-1.5 bg-[#FAF7F2] rounded-xl p-1 border border-[#EFE8DC] shrink-0">
                       <button
+                        type="button"
                         onClick={() => setQty(p.id, l.qty - 1)}
-                        className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center text-xs sm:text-sm font-bold text-[#6E6359] hover:text-[#2B231D]"
+                        aria-label="Decrease quantity"
+                        className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold text-[#6E6359] hover:text-[#2B231D] hover:bg-white transition"
                       >
                         −
                       </button>
-                      <span className="text-xs font-semibold px-0.5 sm:px-1">{l.qty}</span>
+                      <span className="text-xs sm:text-sm font-bold px-1.5 text-center min-w-[20px]">{l.qty}</span>
                       <button
+                        type="button"
                         disabled={l.qty >= p.stock}
                         onClick={() => setQty(p.id, l.qty + 1)}
-                        className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center text-xs sm:text-sm font-bold text-[#6E6359] hover:text-[#2B231D] disabled:opacity-30"
+                        aria-label="Increase quantity"
+                        className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold text-[#6E6359] hover:text-[#2B231D] hover:bg-white disabled:opacity-30 transition"
                       >
                         +
                       </button>
@@ -457,7 +461,7 @@ export default function Cart() {
                     placeholder="e.g. Aditi Sharma"
                     value={address.recipientName}
                     onChange={e => handleFieldChange('recipientName', e.target.value)}
-                    className={`w-full px-3.5 py-2.5 rounded-xl bg-[#FAF7F2] border text-xs sm:text-sm text-[#2B231D] placeholder-[#82756A]/60 focus:outline-none focus:ring-2 transition ${
+                    className={`w-full px-3.5 py-2.5 rounded-xl bg-[#FAF7F2] border text-base sm:text-sm text-[#2B231D] placeholder-[#82756A]/60 focus:outline-none focus:ring-2 transition ${
                       errors.recipientName
                         ? 'border-red-400 bg-red-50/30 focus:ring-red-200 focus:border-red-500'
                         : 'border-[#EFE8DC] focus:ring-[#BD6024]/20 focus:border-[#BD6024]'
@@ -474,7 +478,7 @@ export default function Cart() {
                     Mobile Number <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
-                    <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-xs text-[#82756A] font-semibold pointer-events-none">
+                    <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-sm sm:text-xs text-[#82756A] font-semibold pointer-events-none">
                       +91
                     </span>
                     <input
@@ -484,7 +488,7 @@ export default function Cart() {
                       placeholder="9876543210"
                       value={address.phoneNumber}
                       onChange={e => handleFieldChange('phoneNumber', e.target.value)}
-                      className={`w-full pl-12 pr-3.5 py-2.5 rounded-xl bg-[#FAF7F2] border text-xs sm:text-sm text-[#2B231D] placeholder-[#82756A]/60 focus:outline-none focus:ring-2 transition ${
+                      className={`w-full pl-12 pr-3.5 py-2.5 rounded-xl bg-[#FAF7F2] border text-base sm:text-sm text-[#2B231D] placeholder-[#82756A]/60 focus:outline-none focus:ring-2 transition ${
                         errors.phoneNumber
                           ? 'border-red-400 bg-red-50/30 focus:ring-red-200 focus:border-red-500'
                           : 'border-[#EFE8DC] focus:ring-[#BD6024]/20 focus:border-[#BD6024]'
@@ -507,7 +511,7 @@ export default function Cart() {
                     placeholder="e.g. Flat 402, Oakwood Heights, 14th Main Road, Indiranagar"
                     value={address.streetAddress}
                     onChange={e => handleFieldChange('streetAddress', e.target.value)}
-                    className={`w-full px-3.5 py-2.5 rounded-xl bg-[#FAF7F2] border text-xs sm:text-sm text-[#2B231D] placeholder-[#82756A]/60 focus:outline-none focus:ring-2 transition ${
+                    className={`w-full px-3.5 py-2.5 rounded-xl bg-[#FAF7F2] border text-base sm:text-sm text-[#2B231D] placeholder-[#82756A]/60 focus:outline-none focus:ring-2 transition ${
                       errors.streetAddress
                         ? 'border-red-400 bg-red-50/30 focus:ring-red-200 focus:border-red-500'
                         : 'border-[#EFE8DC] focus:ring-[#BD6024]/20 focus:border-[#BD6024]'
@@ -529,7 +533,7 @@ export default function Cart() {
                     placeholder="e.g. Bengaluru"
                     value={address.city}
                     onChange={e => handleFieldChange('city', e.target.value)}
-                    className={`w-full px-3.5 py-2.5 rounded-xl bg-[#FAF7F2] border text-xs sm:text-sm text-[#2B231D] placeholder-[#82756A]/60 focus:outline-none focus:ring-2 transition ${
+                    className={`w-full px-3.5 py-2.5 rounded-xl bg-[#FAF7F2] border text-base sm:text-sm text-[#2B231D] placeholder-[#82756A]/60 focus:outline-none focus:ring-2 transition ${
                       errors.city
                         ? 'border-red-400 bg-red-50/30 focus:ring-red-200 focus:border-red-500'
                         : 'border-[#EFE8DC] focus:ring-[#BD6024]/20 focus:border-[#BD6024]'
@@ -549,7 +553,7 @@ export default function Cart() {
                     id="state"
                     value={address.state}
                     onChange={e => handleFieldChange('state', e.target.value)}
-                    className={`w-full px-3.5 py-2.5 rounded-xl bg-[#FAF7F2] border text-xs sm:text-sm text-[#2B231D] focus:outline-none focus:ring-2 transition ${
+                    className={`w-full px-3.5 py-2.5 rounded-xl bg-[#FAF7F2] border text-base sm:text-sm text-[#2B231D] focus:outline-none focus:ring-2 transition ${
                       errors.state
                         ? 'border-red-400 bg-red-50/30 focus:ring-red-200 focus:border-red-500'
                         : 'border-[#EFE8DC] focus:ring-[#BD6024]/20 focus:border-[#BD6024]'
@@ -579,7 +583,7 @@ export default function Cart() {
                     placeholder="e.g. 560038"
                     value={address.pinCode}
                     onChange={e => handleFieldChange('pinCode', e.target.value)}
-                    className={`w-full px-3.5 py-2.5 rounded-xl bg-[#FAF7F2] border text-xs sm:text-sm text-[#2B231D] placeholder-[#82756A]/60 focus:outline-none focus:ring-2 transition ${
+                    className={`w-full px-3.5 py-2.5 rounded-xl bg-[#FAF7F2] border text-base sm:text-sm text-[#2B231D] placeholder-[#82756A]/60 focus:outline-none focus:ring-2 transition ${
                       errors.pinCode
                         ? 'border-red-400 bg-red-50/30 focus:ring-red-200 focus:border-red-500'
                         : 'border-[#EFE8DC] focus:ring-[#BD6024]/20 focus:border-[#BD6024]'
@@ -607,7 +611,7 @@ export default function Cart() {
                     placeholder="e.g. Ring the bell at gate #2, call before arrival, deliver to security if unavailable"
                     value={address.deliveryInstructions}
                     onChange={e => handleFieldChange('deliveryInstructions', e.target.value)}
-                    className={`w-full px-3.5 py-2.5 rounded-xl bg-[#FAF7F2] border text-xs sm:text-sm text-[#2B231D] placeholder-[#82756A]/60 focus:outline-none focus:ring-2 transition ${
+                    className={`w-full px-3.5 py-2.5 rounded-xl bg-[#FAF7F2] border text-base sm:text-sm text-[#2B231D] placeholder-[#82756A]/60 focus:outline-none focus:ring-2 transition ${
                       errors.deliveryInstructions
                         ? 'border-red-400 bg-red-50/30 focus:ring-red-200 focus:border-red-500'
                         : 'border-[#EFE8DC] focus:ring-[#BD6024]/20 focus:border-[#BD6024]'

@@ -554,7 +554,7 @@ export default function ProductFormModal({
           </div>
 
           {/* Dimensions */}
-          <div className="grid grid-cols-3 gap-3 sm:gap-4 pt-2 border-t border-[#EFE8DC]">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 pt-2 border-t border-[#EFE8DC]">
             <div>
               <label className="block text-xs font-semibold text-[#2B231D] mb-1">
                 Width (cm) <span className="text-red-500">*</span>

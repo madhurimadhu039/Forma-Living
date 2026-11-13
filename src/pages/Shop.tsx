@@ -30,7 +30,7 @@ export function ProductCard({ p }: { p: Product }) {
         </div>
       </Link>
 
-      <div className="mt-2 pt-2 border-t border-[#F5EFE6] flex items-center justify-between gap-1">
+      <div className="mt-2 pt-2 border-t border-[#F5EFE6] flex flex-wrap items-center justify-between gap-1 gap-y-1.5">
         <div className="min-w-0">
           <span className="font-bold text-[#BD6024] text-xs sm:text-base">{formatPrice(p.price)}</span>
           {p.compareAt && (
@@ -38,7 +38,7 @@ export function ProductCard({ p }: { p: Product }) {
           )}
         </div>
 
-        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0 ml-auto sm:ml-0">
           <button
             type="button"
             disabled={p.stock < 1}

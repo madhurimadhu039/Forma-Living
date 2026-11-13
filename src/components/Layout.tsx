@@ -62,11 +62,11 @@ export function Layout() {
 
           {/* Action Buttons: Search, Wishlist, Cart, Menu */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Search Button */}
+            {/* Search Button (Desktop only; accessible via bottom bar on mobile) */}
             <button
               onClick={() => setSearchOpen(!searchOpen)}
               aria-label="Search"
-              className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-[#E7DFD5] bg-white flex items-center justify-center text-[#2B231D] hover:bg-[#FCEEE2] hover:border-[#BD6024]/40 transition shadow-2xs ${
+              className={`hidden md:flex w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-[#E7DFD5] bg-white items-center justify-center text-[#2B231D] hover:bg-[#FCEEE2] hover:border-[#BD6024]/40 transition shadow-2xs ${
                 searchOpen ? 'bg-[#FCEEE2] border-[#BD6024]/60 text-[#BD6024]' : ''
               }`}
             >
@@ -76,11 +76,11 @@ export function Layout() {
               </svg>
             </button>
 
-            {/* Wishlist Link (Accessible on both mobile and desktop) */}
+            {/* Wishlist Link (Desktop only; accessible via bottom bar on mobile) */}
             <Link
               to="/wishlist"
               aria-label="Wishlist"
-              className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-[#E7DFD5] bg-white flex items-center justify-center text-[#2B231D] hover:bg-[#FCEEE2] hover:border-[#BD6024]/40 transition relative shadow-2xs ${
+              className={`hidden md:flex w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-[#E7DFD5] bg-white items-center justify-center text-[#2B231D] hover:bg-[#FCEEE2] hover:border-[#BD6024]/40 transition relative shadow-2xs ${
                 isActive('/wishlist') ? 'bg-[#FCEEE2] border-[#BD6024]/60 text-[#BD6024]' : ''
               }`}
             >
@@ -94,11 +94,11 @@ export function Layout() {
               )}
             </Link>
 
-            {/* Cart Button */}
+            {/* Cart Button (Desktop only; accessible via bottom bar on mobile) */}
             <Link
               to="/cart"
               aria-label="Cart"
-              className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-[#E7DFD5] bg-white flex items-center justify-center text-[#2B231D] hover:bg-[#FCEEE2] hover:border-[#BD6024]/40 transition relative shadow-2xs ${
+              className={`hidden md:flex w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-[#E7DFD5] bg-white items-center justify-center text-[#2B231D] hover:bg-[#FCEEE2] hover:border-[#BD6024]/40 transition relative shadow-2xs ${
                 cartAnimating ? 'animate-cart-bump border-[#BD6024] text-[#BD6024]' : ''
               }`}
             >
@@ -213,15 +213,15 @@ export function Layout() {
         )}
       </header>
 
-      {/* Main Content View with padding-bottom on mobile for bottom bar */}
-      <main className="flex-1 pb-16 md:pb-0">
+      {/* Main Content View with padding-bottom on mobile for bottom bar and iOS home indicator */}
+      <main className="flex-1 pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] md:pb-0">
         <Outlet />
       </main>
 
-      {/* Mobile Sticky Bottom Navigation Bar (Visible only on mobile screens < 768px) */}
+      {/* Mobile Sticky Bottom Navigation Bar (Visible only on mobile screens < 768px, with iOS safe-area inset) */}
       <nav
         aria-label="Mobile Navigation"
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#FAF7F2]/95 backdrop-blur-md border-t border-[#EFE8DC] px-2 py-1.5 flex items-center justify-around shadow-lg"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#FAF7F2]/95 backdrop-blur-md border-t border-[#EFE8DC] px-2 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom,0px))] flex items-center justify-around shadow-lg"
       >
         {/* Home */}
         <Link

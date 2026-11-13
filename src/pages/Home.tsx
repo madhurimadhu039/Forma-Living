@@ -374,12 +374,12 @@ export default function Home() {
                     </h3>
                   </Link>
 
-                  <div className="mt-2 pt-1 flex items-center justify-between gap-1">
-                    <span className="font-bold text-[#BD6024] text-xs sm:text-base">
+                  <div className="mt-2 pt-1 flex flex-wrap items-center justify-between gap-1 gap-y-1.5">
+                    <span className="font-bold text-[#BD6024] text-xs sm:text-base min-w-0">
                       {formatPrice(product.price)}
                     </span>
 
-                    <div className="flex items-center gap-1 sm:gap-2">
+                    <div className="flex items-center gap-1 sm:gap-2 ml-auto sm:ml-0">
                       <button
                         type="button"
                         disabled={product.stock < 1}
@@ -454,12 +454,12 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right Collection Cards (3 Horizontal Cards on mobile, neatly sized) */}
-            <div className="lg:col-span-8 grid grid-cols-3 gap-2 sm:gap-5">
+            {/* Right Collection Cards (3 Responsive Cards, gracefully wrapping labels on narrow screens) */}
+            <div className="lg:col-span-8 grid grid-cols-3 gap-1.5 sm:gap-5">
               {/* Card 1: New Arrivals */}
               <Link
                 to="/shop?category=Living%20Room"
-                className="group bg-white rounded-xl sm:rounded-2xl p-2 sm:p-3 text-center flex flex-col items-center shadow-sm hover:shadow-md transition duration-300"
+                className="group bg-white rounded-xl sm:rounded-2xl p-1.5 sm:p-3 text-center flex flex-col items-center shadow-sm hover:shadow-md transition duration-300"
               >
                 <div className="aspect-[3/3.8] w-full rounded-lg sm:rounded-xl overflow-hidden bg-[#FAF7F2]">
                   <img
@@ -468,18 +468,18 @@ export default function Home() {
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                   />
                 </div>
-                <div className="mt-2 sm:mt-3 mb-0.5 sm:mb-1 flex items-center justify-center gap-1 sm:gap-2 text-[#2B231D]">
-                  <span className="w-4 h-4 sm:w-6 sm:h-6 rounded-full bg-[#344030] text-[#F2DFCE] flex items-center justify-center text-[9px] sm:text-xs">
+                <div className="mt-1.5 sm:mt-3 mb-0.5 sm:mb-1 flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 text-[#2B231D]">
+                  <span className="w-4 h-4 sm:w-6 sm:h-6 rounded-full bg-[#344030] text-[#F2DFCE] flex items-center justify-center text-[9px] sm:text-xs shrink-0">
                     ★
                   </span>
-                  <span className="font-semibold text-[10px] sm:text-sm line-clamp-1">New Arrivals</span>
+                  <span className="font-semibold text-[10px] sm:text-sm text-center leading-tight line-clamp-2">New Arrivals</span>
                 </div>
               </Link>
 
               {/* Card 2: Minimalist Design */}
               <Link
                 to="/shop?category=Storage"
-                className="group bg-white rounded-xl sm:rounded-2xl p-2 sm:p-3 text-center flex flex-col items-center shadow-sm hover:shadow-md transition duration-300"
+                className="group bg-white rounded-xl sm:rounded-2xl p-1.5 sm:p-3 text-center flex flex-col items-center shadow-sm hover:shadow-md transition duration-300"
               >
                 <div className="aspect-[3/3.8] w-full rounded-lg sm:rounded-xl overflow-hidden bg-[#FAF7F2]">
                   <img
@@ -488,18 +488,18 @@ export default function Home() {
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                   />
                 </div>
-                <div className="mt-2 sm:mt-3 mb-0.5 sm:mb-1 flex items-center justify-center gap-1 sm:gap-2 text-[#2B231D]">
-                  <span className="w-4 h-4 sm:w-6 sm:h-6 rounded-full bg-[#344030] text-[#F2DFCE] flex items-center justify-center text-[9px] sm:text-xs">
+                <div className="mt-1.5 sm:mt-3 mb-0.5 sm:mb-1 flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 text-[#2B231D]">
+                  <span className="w-4 h-4 sm:w-6 sm:h-6 rounded-full bg-[#344030] text-[#F2DFCE] flex items-center justify-center text-[9px] sm:text-xs shrink-0">
                     🛋
                   </span>
-                  <span className="font-semibold text-[10px] sm:text-sm line-clamp-1">Minimalist</span>
+                  <span className="font-semibold text-[10px] sm:text-sm text-center leading-tight line-clamp-2">Minimalist</span>
                 </div>
               </Link>
 
               {/* Card 3: Special Offers */}
               <Link
                 to="/shop"
-                className="group bg-white rounded-xl sm:rounded-2xl p-2 sm:p-3 text-center flex flex-col items-center shadow-sm hover:shadow-md transition duration-300"
+                className="group bg-white rounded-xl sm:rounded-2xl p-1.5 sm:p-3 text-center flex flex-col items-center shadow-sm hover:shadow-md transition duration-300"
               >
                 <div className="aspect-[3/3.8] w-full rounded-lg sm:rounded-xl overflow-hidden bg-[#FAF7F2]">
                   <img
@@ -508,11 +508,11 @@ export default function Home() {
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                   />
                 </div>
-                <div className="mt-2 sm:mt-3 mb-0.5 sm:mb-1 flex items-center justify-center gap-1 sm:gap-2 text-[#2B231D]">
-                  <span className="w-4 h-4 sm:w-6 sm:h-6 rounded-full bg-[#344030] text-[#F2DFCE] flex items-center justify-center text-[9px] sm:text-xs">
+                <div className="mt-1.5 sm:mt-3 mb-0.5 sm:mb-1 flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 text-[#2B231D]">
+                  <span className="w-4 h-4 sm:w-6 sm:h-6 rounded-full bg-[#344030] text-[#F2DFCE] flex items-center justify-center text-[9px] sm:text-xs shrink-0">
                     %
                   </span>
-                  <span className="font-semibold text-[10px] sm:text-sm line-clamp-1">Special Offers</span>
+                  <span className="font-semibold text-[10px] sm:text-sm text-center leading-tight line-clamp-2">Special Offers</span>
                 </div>
               </Link>
             </div>
