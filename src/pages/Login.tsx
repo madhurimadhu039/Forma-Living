@@ -1,11 +1,11 @@
-import { FormEvent, useState } from 'react'
+import { FormEvent, useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
+import { useAuth, formatAuthError } from '../contexts/AuthContext'
 import { useCart } from '../contexts/CartContext'
 import { useProducts } from '../contexts/ProductContext'
 
 export default function Login() {
-  const { user, isAdmin, login, register, reset, logout } = useAuth()
+  const { user, isAdmin, login, register, reset, logout, resendVerificationEmail, reloadUser } = useAuth()
   const { lines, wishlist } = useCart()
   const { getProductById } = useProducts()
   const nav = useNavigate()
@@ -17,6 +17,64 @@ export default function Login() {
   const [msg, setMsg] = useState('')
   const [msgType, setMsgType] = useState<'error' | 'success'>('error')
   const [loading, setLoading] = useState(false)
+
+  // Email verification resend & refresh state
+  const [resendLoading, setResendLoading] = useState(false)
+  const [resendNotice, setResendNotice] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+  const [checkingVerification, setCheckingVerification] = useState(false)
+
+  useEffect(() => {
+    if (user && !user.emailVerified) {
+      reloadUser().catch(() => {})
+    }
+  }, [user?.uid])
+
+  async function handleResendVerification() {
+    if (resendLoading || checkingVerification) return
+    setResendLoading(true)
+    setResendNotice(null)
+    try {
+      await resendVerificationEmail()
+      setResendNotice({
+        type: 'success',
+        message: 'Verification email sent! Please check your inbox and Spam/Junk folder.',
+      })
+    } catch (err: any) {
+      setResendNotice({
+        type: 'error',
+        message: formatAuthError(err),
+      })
+    } finally {
+      setResendLoading(false)
+    }
+  }
+
+  async function handleRefreshVerification() {
+    if (checkingVerification || resendLoading) return
+    setCheckingVerification(true)
+    setResendNotice(null)
+    try {
+      const isVerified = await reloadUser()
+      if (isVerified) {
+        setResendNotice({
+          type: 'success',
+          message: 'Your email address is verified!',
+        })
+      } else {
+        setResendNotice({
+          type: 'error',
+          message: 'Email is still not verified. Please click the link sent to your inbox.',
+        })
+      }
+    } catch {
+      setResendNotice({
+        type: 'error',
+        message: 'Unable to refresh verification status. Please check your connection and try again.',
+      })
+    } finally {
+      setCheckingVerification(false)
+    }
+  }
 
   const totalCartCount = lines.reduce((s, l) => s + l.qty, 0)
   const totalWishCount = wishlist.filter(id => Boolean(getProductById(id))).length
@@ -83,15 +141,115 @@ export default function Login() {
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#FCEEE2] text-[#BD6024] font-bold flex items-center justify-center text-2xl border-2 border-[#BD6024]/20 shadow-xs">
               {user.email?.charAt(0).toUpperCase() || 'U'}
             </div>
-            <span className="inline-block px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-semibold mb-2">
-              Signed In
-            </span>
+            {/* Authentication and Verification Status Badges */}
+            <div className="flex flex-wrap items-center justify-center gap-2 mb-2">
+              <span className="inline-block px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-semibold">
+                Signed In
+              </span>
+              {user.emailVerified ? (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-semibold">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 text-emerald-600">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Email Verified
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-[11px] font-semibold">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 text-amber-600">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                    <line x1="12" y1="9" x2="12" y2="13" />
+                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                  </svg>
+                  Email Not Verified
+                </span>
+              )}
+            </div>
+
             <h1 className="font-sans font-bold text-xl sm:text-2xl text-[#2B231D]">
               Account Overview
             </h1>
             <p className="mt-1 text-xs sm:text-sm text-[#82756A] font-medium">
               {user.email}
             </p>
+
+            {/* Unverified Email Warning Card & Resend Trigger */}
+            {!user.emailVerified && (
+              <div className="mt-4 p-3.5 sm:p-4 rounded-xl bg-amber-50/70 border border-amber-200/80 text-left text-xs text-[#2B231D]">
+                <div className="flex items-start gap-2.5">
+                  <div className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center shrink-0 mt-0.5 text-amber-800">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="8" x2="12" y2="12" />
+                      <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-amber-900 text-xs sm:text-sm">
+                      Please verify your email address
+                    </p>
+                    <p className="mt-0.5 text-[11px] sm:text-xs text-amber-800/90 leading-relaxed">
+                      Verify your account to protect your orders. If you haven't received a link, check your spam folder or request a new email below.
+                    </p>
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        disabled={resendLoading || checkingVerification}
+                        onClick={handleResendVerification}
+                        className="px-3 py-1.5 rounded-lg bg-[#BD6024] hover:bg-[#a5511c] disabled:opacity-50 text-white font-semibold text-xs transition shadow-2xs flex items-center gap-1.5"
+                      >
+                        {resendLoading ? (
+                          <>
+                            <svg className="animate-spin -ml-0.5 h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                            </svg>
+                            <span>Sending...</span>
+                          </>
+                        ) : (
+                          <>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
+                              <line x1="22" y1="2" x2="11" y2="13" />
+                              <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                            </svg>
+                            <span>Resend Verification Email</span>
+                          </>
+                        )}
+                      </button>
+
+                      <button
+                        type="button"
+                        disabled={resendLoading || checkingVerification}
+                        onClick={handleRefreshVerification}
+                        className="px-2.5 py-1.5 rounded-lg border border-amber-300 bg-white hover:bg-amber-100/50 disabled:opacity-50 text-amber-900 font-semibold text-xs transition flex items-center gap-1"
+                        title="Check if email was verified in another tab"
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`w-3.5 h-3.5 ${checkingVerification ? 'animate-spin' : ''}`}>
+                          <polyline points="23 4 23 10 17 10" />
+                          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                        </svg>
+                        <span>{checkingVerification ? 'Checking...' : 'Check Status'}</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Resend Notice Feedback */}
+                {resendNotice && (
+                  <div
+                    className={`mt-3 p-2.5 rounded-lg text-xs flex items-start gap-2 ${
+                      resendNotice.type === 'success'
+                        ? 'bg-emerald-100/90 border border-emerald-300 text-emerald-900'
+                        : 'bg-red-100/90 border border-red-300 text-red-900'
+                    }`}
+                  >
+                    <span className="font-bold shrink-0 mt-0.5">
+                      {resendNotice.type === 'success' ? '✓' : '⚠️'}
+                    </span>
+                    <span className="leading-snug">{resendNotice.message}</span>
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="grid grid-cols-2 gap-3 my-6 text-xs">
               <Link
