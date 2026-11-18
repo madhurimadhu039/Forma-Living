@@ -1,14 +1,16 @@
+import { lazy } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { Layout, Protected } from './components/Layout'
 import Home from './pages/Home'
-import Shop from './pages/Shop'
-import ProductPage from './pages/Product'
-import Cart from './pages/Cart'
-import Wishlist from './pages/Wishlist'
-import Login from './pages/Login'
-import About from './pages/About'
-import Contact from './pages/Contact'
-import Admin from './pages/Admin'
+
+const Shop = lazy(() => import('./pages/Shop'))
+const ProductPage = lazy(() => import('./pages/Product'))
+const Cart = lazy(() => import('./pages/Cart'))
+const Wishlist = lazy(() => import('./pages/Wishlist'))
+const Login = lazy(() => import('./pages/Login'))
+const About = lazy(() => import('./pages/About'))
+const Contact = lazy(() => import('./pages/Contact'))
+const Admin = lazy(() => import('./pages/Admin'))
 
 const Privacy = () => (
   <div className="mx-auto max-w-4xl px-4 py-16">

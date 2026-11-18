@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { Link, Outlet, Navigate, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useCart } from '../contexts/CartContext'
 import { useProducts } from '../contexts/ProductContext'
+import RouteLoading from './RouteLoading'
 
 export function Layout() {
   const { user, logout } = useAuth()
@@ -215,7 +216,9 @@ export function Layout() {
 
       {/* Main Content View with padding-bottom on mobile for bottom bar and iOS home indicator */}
       <main className="flex-1 pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] md:pb-0">
-        <Outlet />
+        <Suspense fallback={<RouteLoading />}>
+          <Outlet />
+        </Suspense>
       </main>
 
       {/* Mobile Sticky Bottom Navigation Bar (Visible only on mobile screens < 768px, with iOS safe-area inset) */}
