@@ -1,6 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { writeBatch, doc, serverTimestamp } from 'firebase/firestore'
+import {
+  writeBatch,
+  doc,
+  serverTimestamp,
+  collection,
+  query,
+  orderBy,
+  onSnapshot,
+} from 'firebase/firestore'
 import { db } from '../config/firebase'
 import { useAuth } from '../contexts/AuthContext'
 import { useProducts } from '../contexts/ProductContext'
@@ -13,6 +21,16 @@ import {
   updateProductStockInTransaction,
 } from '../services/adminProducts'
 import ProductFormModal from '../components/admin/ProductFormModal'
+
+interface CustomerInquiry {
+  id: string
+  name: string
+  email: string
+  subject: string
+  message: string
+  status: string
+  createdAt?: any
+}
 
 interface StockDraftEntry {
   value: string
@@ -80,6 +98,16 @@ export default function Admin() {
     text: string
   } | null>(null)
 
+  // Top-level Admin navigation tab
+  const [activeAdminTab, setActiveAdminTab] = useState<'products' | 'inquiries'>('products')
+
+  // Customer Inquiries inbox state
+  const [inquiries, setInquiries] = useState<CustomerInquiry[]>([])
+  const [inquiriesLoading, setInquiriesLoading] = useState(false)
+  const [inquiriesError, setInquiriesError] = useState<string | null>(null)
+  const [inquirySearch, setInquirySearch] = useState('')
+  const [inquirySubjectFilter, setInquirySubjectFilter] = useState('all')
+
   // Verify admin claim with force-refresh on mount or on demand
   const verifyAdminClaim = async () => {
     if (!user) {
@@ -127,6 +155,87 @@ export default function Admin() {
     }
     return true
   }
+
+  // Real-time Firestore customer inquiries listener (admin only)
+  useEffect(() => {
+    if (!user || !adminVerified) {
+      setInquiries([])
+      setInquiriesLoading(false)
+      return
+    }
+
+    setInquiriesLoading(true)
+    setInquiriesError(null)
+
+    const q = query(collection(db, 'inquiries'), orderBy('createdAt', 'desc'))
+    const unsub = onSnapshot(
+      q,
+      snapshot => {
+        const list: CustomerInquiry[] = []
+        snapshot.forEach(docSnap => {
+          const data = docSnap.data()
+          list.push({
+            id: docSnap.id,
+            name: data.name || 'Anonymous',
+            email: data.email || 'No email',
+            subject: data.subject || 'General Inquiry',
+            message: data.message || '',
+            status: data.status || 'new',
+            createdAt: data.createdAt,
+          })
+        })
+        setInquiries(list)
+        setInquiriesLoading(false)
+      },
+      err => {
+        console.warn('Inquiries listener error:', err)
+        setInquiriesError(err.message || 'Permission denied: Unable to read customer inquiries.')
+        setInquiriesLoading(false)
+      }
+    )
+
+    return () => unsub()
+  }, [user?.uid, adminVerified])
+
+  const formatInquiryDate = (ts: any): string => {
+    if (!ts) return 'Just now'
+    try {
+      const d =
+        typeof ts?.toDate === 'function'
+          ? ts.toDate()
+          : ts?.seconds
+          ? new Date(ts.seconds * 1000)
+          : new Date(ts)
+      if (isNaN(d.getTime())) return 'Recently'
+      return d.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    } catch {
+      return 'Recently'
+    }
+  }
+
+  const filteredInquiries = useMemo(() => {
+    const q = inquirySearch.trim().toLowerCase()
+    return inquiries.filter(item => {
+      if (inquirySubjectFilter !== 'all' && item.subject !== inquirySubjectFilter) {
+        return false
+      }
+      if (q) {
+        const matches =
+          item.name.toLowerCase().includes(q) ||
+          item.email.toLowerCase().includes(q) ||
+          item.subject.toLowerCase().includes(q) ||
+          item.message.toLowerCase().includes(q)
+        if (!matches) return false
+      }
+      return true
+    })
+  }, [inquiries, inquirySearch, inquirySubjectFilter])
 
   // Keep live Editing Product synced from context so stock stays fresh
   const editingProduct = useMemo(() => {
@@ -587,7 +696,56 @@ export default function Admin() {
         </div>
       </div>
 
-      {/* Product Management Section */}
+      {/* Top-Level Admin Navigation Tabs */}
+      <div className="flex items-center gap-2 border-b border-[#EFE8DC] pb-2">
+        <button
+          type="button"
+          onClick={() => setActiveAdminTab('products')}
+          className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 ${
+            activeAdminTab === 'products'
+              ? 'bg-[#BD6024] text-white shadow-xs'
+              : 'bg-white text-[#6E6359] border border-[#EFE8DC] hover:bg-[#FAF7F2]'
+          }`}
+        >
+          <span>Product Catalog</span>
+          <span
+            className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+              activeAdminTab === 'products'
+                ? 'bg-white/20 text-white'
+                : 'bg-[#FAF7F2] text-[#6E6359]'
+            }`}
+          >
+            {summaryStats.total}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveAdminTab('inquiries')}
+          className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 ${
+            activeAdminTab === 'inquiries'
+              ? 'bg-[#BD6024] text-white shadow-xs'
+              : 'bg-white text-[#6E6359] border border-[#EFE8DC] hover:bg-[#FAF7F2]'
+          }`}
+        >
+          <span>Customer Inquiries</span>
+          <span
+            className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+              activeAdminTab === 'inquiries'
+                ? 'bg-white text-[#BD6024]'
+                : inquiries.length > 0
+                ? 'bg-[#BD6024] text-white'
+                : 'bg-[#FAF7F2] text-[#6E6359]'
+            }`}
+          >
+            {inquiries.length}
+          </span>
+        </button>
+      </div>
+
+      {activeAdminTab === 'products' ? (
+        <>
+          {/* Product Management Section */}
       <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-8 border border-[#EFE8DC] shadow-sm space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -1418,6 +1576,236 @@ export default function Admin() {
           </div>
         )}
       </div>
+        </>
+      ) : (
+        /* Customer Inquiries Inbox Section */
+        <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-8 border border-[#EFE8DC] shadow-sm space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#EFE8DC]">
+            <div>
+              <div className="flex flex-wrap items-center gap-2.5">
+                <h2 className="font-sans font-bold text-xl sm:text-2xl text-[#2B231D]">
+                  Customer Inquiries Inbox
+                </h2>
+                <span
+                  className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${
+                    adminVerified
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                      : 'bg-amber-50 text-amber-800 border-amber-200'
+                  }`}
+                >
+                  {inquiriesLoading
+                    ? 'Syncing…'
+                    : adminVerified
+                    ? 'Live Firestore Sync'
+                    : 'Admin Verification Required'}
+                </span>
+              </div>
+              <p className="mt-1 text-xs sm:text-sm text-[#82756A]">
+                Messages, custom dimension inquiries, trade requests, and order questions submitted
+                through the Contact page.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-xs text-[#82756A]">
+                Total: <strong className="text-[#2B231D] font-bold">{inquiries.length}</strong>
+              </span>
+            </div>
+          </div>
+
+          {/* Search & Subject Filter Bar */}
+          <div className="flex flex-col md:flex-row gap-3">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                placeholder="Search by customer name, email, subject, or message..."
+                value={inquirySearch}
+                onChange={e => setInquirySearch(e.target.value)}
+                className="w-full bg-[#FAF7F2] border border-[#E7DFD5] rounded-xl pl-9 pr-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#BD6024]"
+              />
+              <span className="absolute left-3 top-2.5 text-[#82756A] text-xs">🔍</span>
+              {inquirySearch && (
+                <button
+                  type="button"
+                  onClick={() => setInquirySearch('')}
+                  className="absolute right-3 top-2.5 text-xs text-[#82756A] hover:text-[#2B231D]"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <select
+                value={inquirySubjectFilter}
+                onChange={e => setInquirySubjectFilter(e.target.value)}
+                className="bg-[#FAF7F2] border border-[#E7DFD5] rounded-xl px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#BD6024] text-[#2B231D]"
+              >
+                <option value="all">All Purposes ({inquiries.length})</option>
+                <option value="Design Advice">Design Advice</option>
+                <option value="Order Status">Order Status</option>
+                <option value="Custom Dimensions">Custom Dimensions</option>
+                <option value="Trade Partnership">Trade Partnership</option>
+                <option value="Returns & Warranty">Returns &amp; Warranty</option>
+              </select>
+
+              {(inquirySearch || inquirySubjectFilter !== 'all') && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setInquirySearch('')
+                    setInquirySubjectFilter('all')
+                  }}
+                  className="px-3 py-2 rounded-xl border border-[#E7DFD5] bg-white hover:bg-[#FAF7F2] text-xs font-semibold text-[#82756A] transition shrink-0"
+                >
+                  Reset
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* State Handling: Auth / Loading / Error / Empty / List */}
+          {!adminVerified ? (
+            <div className="p-8 text-center bg-amber-50 rounded-2xl border border-amber-200 text-amber-900 space-y-2">
+              <p className="font-bold text-sm">Administrator Authorization Required</p>
+              <p className="text-xs max-w-md mx-auto text-amber-800">
+                Your Firebase user does not currently have the custom claim <code>admin: true</code>.
+                Only verified administrators can read customer messages.
+              </p>
+              <button
+                type="button"
+                onClick={verifyAdminClaim}
+                className="mt-3 px-4 py-2 rounded-xl bg-[#BD6024] text-white text-xs font-semibold hover:bg-[#a5511c] transition"
+              >
+                Force Refresh Token
+              </button>
+            </div>
+          ) : inquiriesLoading ? (
+            <div className="py-16 text-center space-y-3">
+              <div className="w-8 h-8 mx-auto rounded-full border-2 border-[#E7DFD5] border-t-[#BD6024] animate-spin" />
+              <p className="text-xs font-semibold text-[#82756A] uppercase tracking-wider">
+                Loading customer inquiries…
+              </p>
+            </div>
+          ) : inquiriesError ? (
+            <div className="p-5 rounded-2xl bg-red-50 border border-red-200 text-red-900 space-y-2">
+              <div className="flex items-center gap-2 font-bold text-sm text-red-800">
+                <span>⚠️</span>
+                <span>Failed to Load Inquiries</span>
+              </div>
+              <p className="text-xs text-red-700">{inquiriesError}</p>
+              <button
+                type="button"
+                onClick={verifyAdminClaim}
+                className="px-3 py-1.5 rounded-lg bg-red-700 hover:bg-red-800 text-white text-xs font-semibold transition"
+              >
+                Retry
+              </button>
+            </div>
+          ) : inquiries.length === 0 ? (
+            <div className="py-16 text-center space-y-3 border border-dashed border-[#E7DFD5] rounded-2xl">
+              <div className="w-14 h-14 mx-auto rounded-full bg-[#FCEEE2] text-[#BD6024] flex items-center justify-center text-2xl">
+                ✉️
+              </div>
+              <h3 className="font-bold text-base text-[#2B231D]">No Inquiries Yet</h3>
+              <p className="text-xs text-[#82756A] max-w-sm mx-auto">
+                Customer inquiries submitted through the Contact page will be securely stored in
+                Firestore and appear here in real time.
+              </p>
+            </div>
+          ) : filteredInquiries.length === 0 ? (
+            <div className="py-12 text-center space-y-2 border border-dashed border-[#E7DFD5] rounded-2xl">
+              <p className="font-bold text-sm text-[#2B231D]">No matching inquiries found</p>
+              <p className="text-xs text-[#82756A]">
+                Try adjusting your search terms or resetting filters.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setInquirySearch('')
+                  setInquirySubjectFilter('all')
+                }}
+                className="mt-2 px-3 py-1.5 rounded-lg bg-[#FAF7F2] border border-[#E7DFD5] text-xs font-semibold text-[#2B231D]"
+              >
+                Clear Search
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <p className="text-xs font-semibold text-[#82756A]">
+                Showing {filteredInquiries.length} of {inquiries.length} inquiries
+              </p>
+
+              <div className="space-y-3">
+                {filteredInquiries.map(inq => (
+                  <div
+                    key={inq.id}
+                    className="p-4 sm:p-5 rounded-2xl border border-[#EFE8DC] bg-white hover:border-[#BD6024]/40 hover:shadow-xs transition space-y-3"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2.5">
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-full bg-[#FCEEE2] text-[#BD6024] font-bold flex items-center justify-center text-sm shrink-0 border border-[#BD6024]/20">
+                          {inq.name.charAt(0).toUpperCase() || 'C'}
+                        </div>
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h4 className="font-bold text-sm text-[#2B231D]">{inq.name}</h4>
+                            <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold uppercase tracking-wider">
+                              {inq.status || 'new'}
+                            </span>
+                            <span className="px-2.5 py-0.5 rounded-full bg-[#FAF7F2] text-[#BD6024] border border-[#EFE8DC] text-[11px] font-semibold">
+                              {inq.subject}
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-2 mt-0.5 text-xs text-[#82756A]">
+                            <a
+                              href={`mailto:${inq.email}`}
+                              className="text-[#BD6024] hover:underline font-medium"
+                            >
+                              {inq.email}
+                            </a>
+                            <span>•</span>
+                            <span>{formatInquiryDate(inq.createdAt)}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="shrink-0 flex items-center gap-2">
+                        <a
+                          href={`mailto:${encodeURIComponent(inq.email)}?subject=${encodeURIComponent(
+                            `Re: ${inq.subject} - Forma Living Concierge`
+                          )}&body=${encodeURIComponent(
+                            `Hi ${inq.name},\n\nThank you for reaching out to Forma Living regarding "${inq.subject}".\n\n`
+                          )}`}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#2B231D] hover:bg-[#3F332B] text-white text-xs font-semibold transition shadow-2xs"
+                        >
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="w-3.5 h-3.5"
+                          >
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                            <polyline points="22,6 12,13 2,6" />
+                          </svg>
+                          <span>Reply via Email</span>
+                        </a>
+                      </div>
+                    </div>
+
+                    <div className="bg-[#FAF7F2] rounded-xl p-3.5 border border-[#EFE8DC] text-xs sm:text-sm text-[#2B231D] whitespace-pre-wrap leading-relaxed">
+                      {inq.message}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Add / Edit Product Modal */}
       <ProductFormModal

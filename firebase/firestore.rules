@@ -13,6 +13,22 @@ service cloud.firestore {
     match /addresses/{id} { allow read, update, delete: if signedIn() && resource.data.uid == request.auth.uid; allow create: if signedIn() && request.resource.data.uid == request.auth.uid; }
     match /moodBoards/{id} { allow read, update, delete: if signedIn() && resource.data.uid == request.auth.uid; allow create: if signedIn() && request.resource.data.uid == request.auth.uid; }
     match /reviews/{id} { allow read: if true; allow create: if signedIn() && request.resource.data.uid == request.auth.uid; allow update, delete: if isAdmin(); }
+    match /inquiries/{id} {
+      allow read, delete, update: if isAdmin();
+      allow create: if request.resource.data.keys().hasAll(['name', 'email', 'subject', 'message', 'status', 'createdAt', 'honeypot'])
+                    && request.resource.data.keys().hasOnly(['name', 'email', 'subject', 'message', 'status', 'createdAt', 'honeypot'])
+                    && request.resource.data.name is string
+                    && request.resource.data.name.size() >= 2 && request.resource.data.name.size() <= 100
+                    && request.resource.data.email is string
+                    && request.resource.data.email.size() >= 3 && request.resource.data.email.size() <= 120
+                    && request.resource.data.subject in ['Design Advice', 'Order Status', 'Custom Dimensions', 'Trade Partnership', 'Returns & Warranty']
+                    && request.resource.data.message is string
+                    && request.resource.data.message.size() >= 10 && request.resource.data.message.size() <= 2000
+                    && request.resource.data.status == 'new'
+                    && request.resource.data.createdAt == request.time
+                    && request.resource.data.honeypot is string
+                    && request.resource.data.honeypot.size() == 0;
+    }
     // Orders and payments are written ONLY by Cloud Functions (Admin SDK).
     match /orders/{id} { allow read: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin()); allow write: if false; }
     match /payments/{id} { allow read: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin()); allow write: if false; }

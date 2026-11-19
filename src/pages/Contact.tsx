@@ -1,13 +1,100 @@
-import { useState, FormEvent } from 'react'
+import { useState, useEffect, FormEvent } from 'react'
 import { Link } from 'react-router-dom'
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
+import { db } from '../config/firebase'
+import { useAuth } from '../contexts/AuthContext'
 
 export default function Contact() {
+  const { user } = useAuth()
   const [submitted, setSubmitted] = useState(false)
-  const [form, setForm] = useState({ name: '', email: '', subject: 'Design Advice', message: '' })
+  const [submitting, setSubmitting] = useState(false)
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    subject: 'Design Advice',
+    message: '',
+    honeypot: '',
+  })
 
-  const handleSubmit = (e: FormEvent) => {
+  // Prefill name and email if customer is authenticated
+  useEffect(() => {
+    if (user) {
+      setForm(prev => ({
+        ...prev,
+        name: prev.name || user.displayName || '',
+        email: prev.email || user.email || '',
+      }))
+    }
+  }, [user])
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    setSubmitted(true)
+    if (submitting) return
+    setErrorMsg(null)
+
+    // Honeypot check: Bots filling the hidden input are silently dropped
+    if (form.honeypot && form.honeypot.trim() !== '') {
+      setSubmitted(true)
+      return
+    }
+
+    const trimmedName = form.name.trim()
+    const trimmedEmail = form.email.trim()
+    const trimmedMessage = form.message.trim()
+
+    if (!trimmedName || trimmedName.length < 2 || trimmedName.length > 100) {
+      setErrorMsg('Please enter your full name (2–100 characters).')
+      return
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!trimmedEmail || !emailRegex.test(trimmedEmail) || trimmedEmail.length > 120) {
+      setErrorMsg('Please enter a valid email address (up to 120 characters).')
+      return
+    }
+
+    const allowedSubjects = [
+      'Design Advice',
+      'Order Status',
+      'Custom Dimensions',
+      'Trade Partnership',
+      'Returns & Warranty',
+    ]
+    if (!allowedSubjects.includes(form.subject)) {
+      setErrorMsg('Please select a valid inquiry purpose.')
+      return
+    }
+
+    if (!trimmedMessage || trimmedMessage.length < 10 || trimmedMessage.length > 2000) {
+      setErrorMsg('Please enter a message between 10 and 2000 characters.')
+      return
+    }
+
+    setSubmitting(true)
+
+    try {
+      await addDoc(collection(db, 'inquiries'), {
+        name: trimmedName,
+        email: trimmedEmail,
+        subject: form.subject,
+        message: trimmedMessage,
+        status: 'new',
+        createdAt: serverTimestamp(),
+        honeypot: '',
+      })
+      setSubmitted(true)
+    } catch (err: any) {
+      console.error('Contact form submission error:', err)
+      const code = err?.code || ''
+      if (code === 'permission-denied') {
+        setErrorMsg('Submission rejected by server: Please verify that all fields meet requirements.')
+      } else {
+        setErrorMsg('Unable to submit your inquiry at this time. Please check your connection or contact hello@formaliving.com directly.')
+      }
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -95,12 +182,20 @@ export default function Contact() {
                 </div>
                 <h3 className="text-xl sm:text-2xl font-bold text-[#2B231D]">Message Sent Successfully</h3>
                 <p className="mt-2 text-xs sm:text-sm text-[#6E6359] max-w-sm mx-auto">
-                  Thank you for reaching out, {form.name || 'there'}! A Forma design specialist will get back to you shortly at {form.email}.
+                  Thank you for reaching out, {form.name || 'there'}! Your inquiry has been securely received, and a Forma design specialist will get back to you shortly at {form.email}.
                 </p>
                 <button
+                  type="button"
                   onClick={() => {
                     setSubmitted(false)
-                    setForm({ name: '', email: '', subject: 'Design Advice', message: '' })
+                    setErrorMsg(null)
+                    setForm({
+                      name: user?.displayName || '',
+                      email: user?.email || '',
+                      subject: 'Design Advice',
+                      message: '',
+                      honeypot: '',
+                    })
                   }}
                   className="mt-6 px-6 py-2.5 rounded-xl bg-[#2B231D] text-white text-xs font-semibold hover:bg-[#3F332B] transition"
                 >
@@ -113,16 +208,40 @@ export default function Contact() {
                   Send a Direct Inquiry
                 </h2>
 
+                {/* Honeypot field for bot spam detection (hidden from real users) */}
+                <div className="hidden" aria-hidden="true" style={{ display: 'none' }}>
+                  <label htmlFor="inquiry_fax_number">Leave this field blank</label>
+                  <input
+                    id="inquiry_fax_number"
+                    type="text"
+                    name="fax_number"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={form.honeypot}
+                    onChange={e => setForm({ ...form, honeypot: e.target.value })}
+                  />
+                </div>
+
+                {/* Error Banner */}
+                {errorMsg && (
+                  <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs flex items-start gap-2">
+                    <span className="font-bold text-red-600 mt-0.5">⚠️</span>
+                    <span className="leading-snug">{errorMsg}</span>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-[#6E6359] mb-1">Your Full Name</label>
                     <input
                       type="text"
                       required
+                      maxLength={100}
+                      disabled={submitting}
                       placeholder="Jane Doe"
                       value={form.name}
                       onChange={e => setForm({ ...form, name: e.target.value })}
-                      className="w-full bg-[#FAF7F2] border border-[#EFE8DC] rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#BD6024]"
+                      className="w-full bg-[#FAF7F2] border border-[#EFE8DC] rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#BD6024] disabled:opacity-60"
                     />
                   </div>
                   <div>
@@ -130,10 +249,12 @@ export default function Contact() {
                     <input
                       type="email"
                       required
+                      maxLength={120}
+                      disabled={submitting}
                       placeholder="jane@example.com"
                       value={form.email}
                       onChange={e => setForm({ ...form, email: e.target.value })}
-                      className="w-full bg-[#FAF7F2] border border-[#EFE8DC] rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#BD6024]"
+                      className="w-full bg-[#FAF7F2] border border-[#EFE8DC] rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#BD6024] disabled:opacity-60"
                     />
                   </div>
                 </div>
@@ -142,8 +263,9 @@ export default function Contact() {
                   <label className="block text-xs font-semibold text-[#6E6359] mb-1">Inquiry Purpose</label>
                   <select
                     value={form.subject}
+                    disabled={submitting}
                     onChange={e => setForm({ ...form, subject: e.target.value })}
-                    className="w-full bg-[#FAF7F2] border border-[#EFE8DC] rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#BD6024] text-[#2B231D]"
+                    className="w-full bg-[#FAF7F2] border border-[#EFE8DC] rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#BD6024] text-[#2B231D] disabled:opacity-60"
                   >
                     <option value="Design Advice">Interior Styling &amp; Advice</option>
                     <option value="Order Status">Order Status &amp; Shipping</option>
@@ -154,22 +276,40 @@ export default function Contact() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-[#6E6359] mb-1">Your Message</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-semibold text-[#6E6359]">Your Message</label>
+                    <span className="text-[11px] text-[#82756A]">
+                      {form.message.length}/2000
+                    </span>
+                  </div>
                   <textarea
                     rows={4}
                     required
+                    maxLength={2000}
+                    disabled={submitting}
                     placeholder="Tell us about your space or questions regarding a specific piece..."
                     value={form.message}
                     onChange={e => setForm({ ...form, message: e.target.value })}
-                    className="w-full bg-[#FAF7F2] border border-[#EFE8DC] rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#BD6024] resize-none"
+                    className="w-full bg-[#FAF7F2] border border-[#EFE8DC] rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#BD6024] resize-none disabled:opacity-60"
                   ></textarea>
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-[#BD6024] hover:bg-[#a5511c] text-white font-semibold text-sm sm:text-base shadow-sm hover:shadow transition"
+                  disabled={submitting}
+                  className="w-full py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-[#BD6024] hover:bg-[#a5511c] disabled:opacity-50 text-white font-semibold text-sm sm:text-base shadow-sm hover:shadow transition flex items-center justify-center gap-2"
                 >
-                  Send Message →
+                  {submitting ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                      </svg>
+                      <span>Sending Inquiry…</span>
+                    </>
+                  ) : (
+                    <span>Send Message →</span>
+                  )}
                 </button>
               </form>
             )}
@@ -179,4 +319,3 @@ export default function Contact() {
     </div>
   )
 }
-
