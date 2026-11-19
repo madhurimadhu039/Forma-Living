@@ -276,6 +276,17 @@ export default function Admin() {
     }
   }
 
+  // Switch to inquiries tab and scroll smoothly to the inbox container
+  const handleSwitchToInquiries = () => {
+    setActiveAdminTab('inquiries')
+    setTimeout(() => {
+      const el = document.getElementById('admin-inquiries-inbox')
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    }, 60)
+  }
+
   const formatInquiryDate = (ts: any): string => {
     if (!ts) return 'Just now'
     try {
@@ -877,7 +888,7 @@ export default function Admin() {
         </div>
 
         <div
-          onClick={() => setActiveAdminTab('inquiries')}
+          onClick={handleSwitchToInquiries}
           className="bg-white rounded-2xl p-4 sm:p-5 border border-[#EFE8DC] shadow-xs flex flex-col justify-between cursor-pointer hover:border-[#BD6024]/40 hover:shadow-sm transition"
         >
           <div className="flex items-center justify-between">
@@ -931,7 +942,7 @@ export default function Admin() {
 
         <button
           type="button"
-          onClick={() => setActiveAdminTab('inquiries')}
+          onClick={handleSwitchToInquiries}
           className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 ${
             activeAdminTab === 'inquiries'
               ? 'bg-[#BD6024] text-white shadow-xs'
@@ -1789,7 +1800,10 @@ export default function Admin() {
         </>
       ) : (
         /* Customer Inquiries Inbox Section */
-        <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-8 border border-[#EFE8DC] shadow-sm space-y-6">
+        <div
+          id="admin-inquiries-inbox"
+          className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-8 border border-[#EFE8DC] shadow-sm space-y-6 scroll-mt-6"
+        >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#EFE8DC]">
             <div>
               <div className="flex flex-wrap items-center gap-2.5">
@@ -2014,18 +2028,20 @@ export default function Admin() {
                 {filteredInquiries.map(inq => (
                   <div
                     key={inq.id}
-                    className="p-4 sm:p-5 rounded-2xl border border-[#EFE8DC] bg-white hover:border-[#BD6024]/40 hover:shadow-xs transition space-y-3"
+                    data-testid="inquiry-card"
+                    data-inquiry-id={inq.id}
+                    className="p-4 sm:p-5 rounded-2xl border border-[#E7DFD5] border-l-4 border-l-[#BD6024] bg-[#FAF7F2] shadow-xs hover:shadow-sm transition space-y-3"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2.5">
                       <div className="flex items-start gap-3 min-w-0">
-                        <div className="w-10 h-10 rounded-full bg-[#FCEEE2] text-[#BD6024] font-bold flex items-center justify-center text-sm shrink-0 border border-[#BD6024]/20">
+                        <div className="w-10 h-10 rounded-full bg-[#FCEEE2] text-[#BD6024] font-bold flex items-center justify-center text-sm shrink-0 border border-[#BD6024]/20 shadow-2xs">
                           {(String(inq.name || 'C').trim().charAt(0).toUpperCase() || 'C')}
                         </div>
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
                             <h4 className="font-bold text-sm text-[#2B231D]">{inq.name}</h4>
                             <span
-                              className="text-[10px] font-mono text-[#82756A] bg-[#FAF7F2] px-2 py-0.5 rounded border border-[#EFE8DC]"
+                              className="text-[10px] font-mono text-[#82756A] bg-white px-2 py-0.5 rounded border border-[#E7DFD5]"
                               title={`Inquiry ID: ${inq.id}`}
                             >
                               ID: {inq.id}
@@ -2041,7 +2057,7 @@ export default function Admin() {
                             >
                               {inq.status === 'in-progress' ? 'In Progress' : inq.status || 'new'}
                             </span>
-                            <span className="px-2.5 py-0.5 rounded-full bg-[#FAF7F2] text-[#BD6024] border border-[#EFE8DC] text-[11px] font-semibold">
+                            <span className="px-2.5 py-0.5 rounded-full bg-white text-[#BD6024] border border-[#E7DFD5] text-[11px] font-semibold">
                               {inq.subject}
                             </span>
                           </div>
@@ -2127,7 +2143,7 @@ export default function Admin() {
                       </div>
                     </div>
 
-                    <div className="bg-[#FAF7F2] rounded-xl p-3.5 border border-[#EFE8DC] text-xs sm:text-sm text-[#2B231D] whitespace-pre-wrap leading-relaxed">
+                    <div className="bg-white rounded-xl p-3.5 sm:p-4 border border-[#E7DFD5] shadow-2xs text-xs sm:text-sm text-[#2B231D] whitespace-pre-wrap leading-relaxed">
                       {inq.message || <em className="text-[#82756A] italic">No message body provided.</em>}
                     </div>
                   </div>
