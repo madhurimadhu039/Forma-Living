@@ -6,8 +6,6 @@ import {
   updateDoc,
   serverTimestamp,
   collection,
-  query,
-  orderBy,
   onSnapshot,
 } from 'firebase/firestore'
 import { db } from '../config/firebase'
@@ -173,28 +171,43 @@ export default function Admin() {
     setInquiriesLoading(true)
     setInquiriesError(null)
 
-    const q = query(collection(db, 'inquiries'), orderBy('createdAt', 'desc'))
+    // Listen to inquiries collection and sort client-side by timestamp descending
+    // to guarantee documents with pending/missing createdAt are never dropped by Firestore
+    const q = collection(db, 'inquiries')
     const unsub = onSnapshot(
       q,
       snapshot => {
         const list: CustomerInquiry[] = []
         snapshot.forEach(docSnap => {
           const data = docSnap.data()
-          const rawStatus = data.status
+          const rawStatus = typeof data.status === 'string' ? data.status.trim().toLowerCase() : ''
           const status: 'new' | 'in-progress' | 'resolved' =
-            rawStatus === 'in-progress' || rawStatus === 'resolved' || rawStatus === 'new'
-              ? rawStatus
+            rawStatus === 'in-progress' || rawStatus === 'in progress'
+              ? 'in-progress'
+              : rawStatus === 'resolved'
+              ? 'resolved'
               : 'new'
           list.push({
-            id: docSnap.id,
-            name: data.name || 'Anonymous',
-            email: data.email || 'No email',
-            subject: data.subject || 'General Inquiry',
-            message: data.message || '',
+            id: docSnap.id || (data as any)?.id || '',
+            name: typeof data.name === 'string' && data.name.trim() ? data.name.trim() : 'Anonymous',
+            email: typeof data.email === 'string' && data.email.trim() ? data.email.trim() : 'No email',
+            subject: typeof data.subject === 'string' && data.subject.trim() ? data.subject.trim() : 'General Inquiry',
+            message: typeof data.message === 'string' ? data.message : String(data.message || ''),
             status,
             createdAt: data.createdAt,
             updatedAt: data.updatedAt,
           })
+        })
+        // Sort descending by createdAt (most recent first)
+        list.sort((a, b) => {
+          const getMillis = (ts: any) => {
+            if (!ts) return 0
+            if (typeof ts?.toMillis === 'function') return ts.toMillis()
+            if (typeof ts?.seconds === 'number') return ts.seconds * 1000
+            const d = new Date(ts).getTime()
+            return isNaN(d) ? 0 : d
+          }
+          return getMillis(b.createdAt) - getMillis(a.createdAt)
         })
         setInquiries(list)
         setInquiriesLoading(false)
@@ -266,20 +279,41 @@ export default function Admin() {
   const formatInquiryDate = (ts: any): string => {
     if (!ts) return 'Just now'
     try {
-      const d =
-        typeof ts?.toDate === 'function'
-          ? ts.toDate()
-          : ts?.seconds
-          ? new Date(ts.seconds * 1000)
-          : new Date(ts)
-      if (isNaN(d.getTime())) return 'Recently'
-      return d.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      })
+      if (typeof ts?.toDate === 'function') {
+        const d = ts.toDate()
+        if (!isNaN(d.getTime())) {
+          return d.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          })
+        }
+      }
+      if (typeof ts?.seconds === 'number') {
+        const d = new Date(ts.seconds * 1000)
+        if (!isNaN(d.getTime())) {
+          return d.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          })
+        }
+      }
+      const d = new Date(ts)
+      if (!isNaN(d.getTime())) {
+        return d.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        })
+      }
+      return 'Recently'
     } catch {
       return 'Recently'
     }
@@ -288,19 +322,36 @@ export default function Admin() {
   const filteredInquiries = useMemo(() => {
     const q = inquirySearch.trim().toLowerCase()
     return inquiries.filter(item => {
-      const status = item.status || 'new'
-      if (inquiryStatusFilter !== 'all' && status !== inquiryStatusFilter) {
+      const status = (item.status || 'new').toLowerCase()
+      if (inquiryStatusFilter !== 'all' && status !== inquiryStatusFilter.toLowerCase()) {
         return false
       }
-      if (inquirySubjectFilter !== 'all' && item.subject !== inquirySubjectFilter) {
-        return false
+      if (inquirySubjectFilter !== 'all') {
+        const itemSub = (item.subject || '').toLowerCase()
+        const filterSub = inquirySubjectFilter.toLowerCase()
+        const matchesSubject =
+          itemSub === filterSub ||
+          itemSub.includes(filterSub) ||
+          filterSub.includes(itemSub) ||
+          (filterSub.includes('design') && (itemSub.includes('styling') || itemSub.includes('advice'))) ||
+          (filterSub.includes('order') && (itemSub.includes('shipping') || itemSub.includes('status'))) ||
+          (filterSub.includes('dimensions') && (itemSub.includes('custom') || itemSub.includes('finishes'))) ||
+          (filterSub.includes('trade') && (itemSub.includes('commercial') || itemSub.includes('partnership'))) ||
+          (filterSub.includes('returns') && (itemSub.includes('warranty') || itemSub.includes('questions')))
+        if (!matchesSubject) return false
       }
       if (q) {
+        const id = String(item.id || '').toLowerCase()
+        const name = String(item.name || '').toLowerCase()
+        const email = String(item.email || '').toLowerCase()
+        const subject = String(item.subject || '').toLowerCase()
+        const message = String(item.message || '').toLowerCase()
         const matches =
-          item.name.toLowerCase().includes(q) ||
-          item.email.toLowerCase().includes(q) ||
-          item.subject.toLowerCase().includes(q) ||
-          item.message.toLowerCase().includes(q)
+          id.includes(q) ||
+          name.includes(q) ||
+          email.includes(q) ||
+          subject.includes(q) ||
+          message.includes(q)
         if (!matches) return false
       }
       return true
@@ -1956,7 +2007,7 @@ export default function Admin() {
           ) : (
             <div className="space-y-4">
               <p className="text-xs font-semibold text-[#82756A]">
-                Showing {filteredInquiries.length} of {inquiries.length} inquiries
+                Showing {filteredInquiries.length} of {inquiries.length} {inquiries.length === 1 ? 'inquiry' : 'inquiries'}
               </p>
 
               <div className="space-y-3">
@@ -1968,11 +2019,17 @@ export default function Admin() {
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2.5">
                       <div className="flex items-start gap-3 min-w-0">
                         <div className="w-10 h-10 rounded-full bg-[#FCEEE2] text-[#BD6024] font-bold flex items-center justify-center text-sm shrink-0 border border-[#BD6024]/20">
-                          {inq.name.charAt(0).toUpperCase() || 'C'}
+                          {(String(inq.name || 'C').trim().charAt(0).toUpperCase() || 'C')}
                         </div>
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
                             <h4 className="font-bold text-sm text-[#2B231D]">{inq.name}</h4>
+                            <span
+                              className="text-[10px] font-mono text-[#82756A] bg-[#FAF7F2] px-2 py-0.5 rounded border border-[#EFE8DC]"
+                              title={`Inquiry ID: ${inq.id}`}
+                            >
+                              ID: {inq.id}
+                            </span>
                             <span
                               className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
                                 (inq.status || 'new') === 'new'
@@ -2046,10 +2103,10 @@ export default function Admin() {
                         </div>
 
                         <a
-                          href={`mailto:${encodeURIComponent(inq.email)}?subject=${encodeURIComponent(
-                            `Re: ${inq.subject} - Forma Living Concierge`
+                          href={`mailto:${encodeURIComponent(inq.email || '')}?subject=${encodeURIComponent(
+                            `Re: ${inq.subject || 'Forma Living Inquiry'} - Forma Living Concierge`
                           )}&body=${encodeURIComponent(
-                            `Hi ${inq.name},\n\nThank you for reaching out to Forma Living regarding "${inq.subject}".\n\n`
+                            `Hi ${inq.name || 'there'},\n\nThank you for reaching out to Forma Living regarding "${inq.subject || 'your inquiry'}".\n\n`
                           )}`}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#2B231D] hover:bg-[#3F332B] text-white text-xs font-semibold transition shadow-2xs"
                         >
@@ -2071,7 +2128,7 @@ export default function Admin() {
                     </div>
 
                     <div className="bg-[#FAF7F2] rounded-xl p-3.5 border border-[#EFE8DC] text-xs sm:text-sm text-[#2B231D] whitespace-pre-wrap leading-relaxed">
-                      {inq.message}
+                      {inq.message || <em className="text-[#82756A] italic">No message body provided.</em>}
                     </div>
                   </div>
                 ))}
