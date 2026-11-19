@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import {
   writeBatch,
   doc,
+  updateDoc,
   serverTimestamp,
   collection,
   query,
@@ -28,8 +29,9 @@ interface CustomerInquiry {
   email: string
   subject: string
   message: string
-  status: string
+  status: 'new' | 'in-progress' | 'resolved'
   createdAt?: any
+  updatedAt?: any
 }
 
 interface StockDraftEntry {
@@ -107,6 +109,10 @@ export default function Admin() {
   const [inquiriesError, setInquiriesError] = useState<string | null>(null)
   const [inquirySearch, setInquirySearch] = useState('')
   const [inquirySubjectFilter, setInquirySubjectFilter] = useState('all')
+  const [inquiryStatusFilter, setInquiryStatusFilter] = useState<
+    'all' | 'new' | 'in-progress' | 'resolved'
+  >('all')
+  const [updatingInquiryId, setUpdatingInquiryId] = useState<string | null>(null)
 
   // Verify admin claim with force-refresh on mount or on demand
   const verifyAdminClaim = async () => {
@@ -174,14 +180,20 @@ export default function Admin() {
         const list: CustomerInquiry[] = []
         snapshot.forEach(docSnap => {
           const data = docSnap.data()
+          const rawStatus = data.status
+          const status: 'new' | 'in-progress' | 'resolved' =
+            rawStatus === 'in-progress' || rawStatus === 'resolved' || rawStatus === 'new'
+              ? rawStatus
+              : 'new'
           list.push({
             id: docSnap.id,
             name: data.name || 'Anonymous',
             email: data.email || 'No email',
             subject: data.subject || 'General Inquiry',
             message: data.message || '',
-            status: data.status || 'new',
+            status,
             createdAt: data.createdAt,
+            updatedAt: data.updatedAt,
           })
         })
         setInquiries(list)
@@ -196,6 +208,60 @@ export default function Admin() {
 
     return () => unsub()
   }, [user?.uid, adminVerified])
+
+  // Analytics for customer inquiries
+  const inquiryStats = useMemo(() => {
+    let newCount = 0
+    let inProgressCount = 0
+    let resolvedCount = 0
+    for (const item of inquiries) {
+      if (item.status === 'in-progress') inProgressCount++
+      else if (item.status === 'resolved') resolvedCount++
+      else newCount++
+    }
+    return {
+      total: inquiries.length,
+      new: newCount,
+      inProgress: inProgressCount,
+      resolved: resolvedCount,
+    }
+  }, [inquiries])
+
+  // Admin status update handler for customer inquiries
+  const handleUpdateInquiryStatus = async (
+    inquiryId: string,
+    nextStatus: 'new' | 'in-progress' | 'resolved'
+  ) => {
+    const hasAdmin = await ensureVerifiedAdmin()
+    if (!hasAdmin) return
+
+    setUpdatingInquiryId(inquiryId)
+    try {
+      const docRef = doc(db, 'inquiries', inquiryId)
+      await updateDoc(docRef, {
+        status: nextStatus,
+        updatedAt: serverTimestamp(),
+      })
+      const label =
+        nextStatus === 'in-progress'
+          ? 'In Progress'
+          : nextStatus === 'resolved'
+          ? 'Resolved'
+          : 'New'
+      setActionNotice({
+        type: 'success',
+        text: `Inquiry status updated to "${label}".`,
+      })
+    } catch (err: any) {
+      console.error('Failed to update inquiry status:', err)
+      setActionNotice({
+        type: 'error',
+        text: err?.message || 'Failed to update inquiry status in Firestore.',
+      })
+    } finally {
+      setUpdatingInquiryId(null)
+    }
+  }
 
   const formatInquiryDate = (ts: any): string => {
     if (!ts) return 'Just now'
@@ -222,6 +288,10 @@ export default function Admin() {
   const filteredInquiries = useMemo(() => {
     const q = inquirySearch.trim().toLowerCase()
     return inquiries.filter(item => {
+      const status = item.status || 'new'
+      if (inquiryStatusFilter !== 'all' && status !== inquiryStatusFilter) {
+        return false
+      }
       if (inquirySubjectFilter !== 'all' && item.subject !== inquirySubjectFilter) {
         return false
       }
@@ -235,7 +305,7 @@ export default function Admin() {
       }
       return true
     })
-  }, [inquiries, inquirySearch, inquirySubjectFilter])
+  }, [inquiries, inquirySearch, inquirySubjectFilter, inquiryStatusFilter])
 
   // Keep live Editing Product synced from context so stock stays fresh
   const editingProduct = useMemo(() => {
@@ -696,6 +766,95 @@ export default function Admin() {
         </div>
       </div>
 
+      {/* Executive Business Analytics Strip */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-[#EFE8DC] shadow-xs flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#82756A]">
+              Total Products
+            </span>
+            <span className="w-7 h-7 rounded-lg bg-[#FAF7F2] text-[#BD6024] flex items-center justify-center text-xs">
+              📦
+            </span>
+          </div>
+          <div className="mt-2">
+            <p className="text-2xl sm:text-3xl font-bold text-[#2B231D]">
+              {summaryStats.total}
+            </p>
+            <p className="text-[11px] text-[#82756A] mt-0.5">
+              Across all categories
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-[#EFE8DC] shadow-xs flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700">
+              Active Storefront
+            </span>
+            <span className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center text-xs">
+              ✓
+            </span>
+          </div>
+          <div className="mt-2">
+            <p className="text-2xl sm:text-3xl font-bold text-[#2B231D]">
+              {summaryStats.active}
+            </p>
+            <p className="text-[11px] text-[#82756A] mt-0.5">
+              Visible to customers
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-[#EFE8DC] shadow-xs flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#82756A]">
+              Archived Products
+            </span>
+            <span className="w-7 h-7 rounded-lg bg-[#FAF7F2] text-[#82756A] flex items-center justify-center text-xs">
+              🗄️
+            </span>
+          </div>
+          <div className="mt-2">
+            <p className="text-2xl sm:text-3xl font-bold text-[#2B231D]">
+              {summaryStats.archived}
+            </p>
+            <p className="text-[11px] text-[#82756A] mt-0.5">
+              Hidden from catalog
+            </p>
+          </div>
+        </div>
+
+        <div
+          onClick={() => setActiveAdminTab('inquiries')}
+          className="bg-white rounded-2xl p-4 sm:p-5 border border-[#EFE8DC] shadow-xs flex flex-col justify-between cursor-pointer hover:border-[#BD6024]/40 hover:shadow-sm transition"
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#BD6024]">
+              Customer Inquiries
+            </span>
+            <span className="w-7 h-7 rounded-lg bg-[#FCEEE2] text-[#BD6024] flex items-center justify-center text-xs">
+              ✉️
+            </span>
+          </div>
+          <div className="mt-2">
+            <div className="flex items-baseline gap-2">
+              <p className="text-2xl sm:text-3xl font-bold text-[#2B231D]">
+                {inquiryStats.total}
+              </p>
+              {inquiryStats.new > 0 && (
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700">
+                  {inquiryStats.new} new
+                </span>
+              )}
+            </div>
+            <p className="text-[11px] text-[#82756A] mt-0.5">
+              {inquiryStats.inProgress} in progress · {inquiryStats.resolved} resolved
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Top-Level Admin Navigation Tabs */}
       <div className="flex items-center gap-2 border-b border-[#EFE8DC] pb-2">
         <button
@@ -733,12 +892,12 @@ export default function Admin() {
             className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
               activeAdminTab === 'inquiries'
                 ? 'bg-white text-[#BD6024]'
-                : inquiries.length > 0
+                : inquiryStats.new > 0
                 ? 'bg-[#BD6024] text-white'
                 : 'bg-[#FAF7F2] text-[#6E6359]'
             }`}
           >
-            {inquiries.length}
+            {inquiryStats.new > 0 ? `${inquiryStats.new} new` : inquiries.length}
           </span>
         </button>
       </div>
@@ -1613,7 +1772,58 @@ export default function Admin() {
             </div>
           </div>
 
-          {/* Search & Subject Filter Bar */}
+          {/* Quick-Filter Status Tabs */}
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setInquiryStatusFilter('all')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition ${
+                inquiryStatusFilter === 'all'
+                  ? 'bg-[#2B231D] text-white shadow-xs'
+                  : 'bg-[#FAF7F2] text-[#6E6359] border border-[#E7DFD5] hover:bg-[#F2ECE1]'
+              }`}
+            >
+              All Inquiries ({inquiryStats.total})
+            </button>
+            <button
+              type="button"
+              onClick={() => setInquiryStatusFilter('new')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 ${
+                inquiryStatusFilter === 'new'
+                  ? 'bg-blue-700 text-white shadow-xs'
+                  : 'bg-blue-50 text-blue-800 border border-blue-200 hover:bg-blue-100'
+              }`}
+            >
+              <span className="w-2 h-2 rounded-full bg-blue-500 inline-block" />
+              <span>New ({inquiryStats.new})</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setInquiryStatusFilter('in-progress')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 ${
+                inquiryStatusFilter === 'in-progress'
+                  ? 'bg-amber-700 text-white shadow-xs'
+                  : 'bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100'
+              }`}
+            >
+              <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
+              <span>In Progress ({inquiryStats.inProgress})</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setInquiryStatusFilter('resolved')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 ${
+                inquiryStatusFilter === 'resolved'
+                  ? 'bg-emerald-700 text-white shadow-xs'
+                  : 'bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100'
+              }`}
+            >
+              <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+              <span>Resolved ({inquiryStats.resolved})</span>
+            </button>
+          </div>
+
+          {/* Search & Subject & Status Filter Bar */}
           <div className="flex flex-col md:flex-row gap-3">
             <div className="relative flex-1">
               <input
@@ -1635,7 +1845,18 @@ export default function Admin() {
               )}
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <select
+                value={inquiryStatusFilter}
+                onChange={e => setInquiryStatusFilter(e.target.value as any)}
+                className="bg-[#FAF7F2] border border-[#E7DFD5] rounded-xl px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#BD6024] text-[#2B231D]"
+              >
+                <option value="all">All Statuses ({inquiryStats.total})</option>
+                <option value="new">New ({inquiryStats.new})</option>
+                <option value="in-progress">In Progress ({inquiryStats.inProgress})</option>
+                <option value="resolved">Resolved ({inquiryStats.resolved})</option>
+              </select>
+
               <select
                 value={inquirySubjectFilter}
                 onChange={e => setInquirySubjectFilter(e.target.value)}
@@ -1649,12 +1870,13 @@ export default function Admin() {
                 <option value="Returns & Warranty">Returns &amp; Warranty</option>
               </select>
 
-              {(inquirySearch || inquirySubjectFilter !== 'all') && (
+              {(inquirySearch || inquirySubjectFilter !== 'all' || inquiryStatusFilter !== 'all') && (
                 <button
                   type="button"
                   onClick={() => {
                     setInquirySearch('')
                     setInquirySubjectFilter('all')
+                    setInquiryStatusFilter('all')
                   }}
                   className="px-3 py-2 rounded-xl border border-[#E7DFD5] bg-white hover:bg-[#FAF7F2] text-xs font-semibold text-[#82756A] transition shrink-0"
                 >
@@ -1724,10 +1946,11 @@ export default function Admin() {
                 onClick={() => {
                   setInquirySearch('')
                   setInquirySubjectFilter('all')
+                  setInquiryStatusFilter('all')
                 }}
                 className="mt-2 px-3 py-1.5 rounded-lg bg-[#FAF7F2] border border-[#E7DFD5] text-xs font-semibold text-[#2B231D]"
               >
-                Clear Search
+                Clear Search &amp; Filters
               </button>
             </div>
           ) : (
@@ -1743,15 +1966,23 @@ export default function Admin() {
                     className="p-4 sm:p-5 rounded-2xl border border-[#EFE8DC] bg-white hover:border-[#BD6024]/40 hover:shadow-xs transition space-y-3"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2.5">
-                      <div className="flex items-start gap-3">
+                      <div className="flex items-start gap-3 min-w-0">
                         <div className="w-10 h-10 rounded-full bg-[#FCEEE2] text-[#BD6024] font-bold flex items-center justify-center text-sm shrink-0 border border-[#BD6024]/20">
                           {inq.name.charAt(0).toUpperCase() || 'C'}
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
                             <h4 className="font-bold text-sm text-[#2B231D]">{inq.name}</h4>
-                            <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold uppercase tracking-wider">
-                              {inq.status || 'new'}
+                            <span
+                              className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                                (inq.status || 'new') === 'new'
+                                  ? 'bg-blue-50 text-blue-700 border-blue-200'
+                                  : (inq.status || 'new') === 'in-progress'
+                                  ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                  : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                              }`}
+                            >
+                              {inq.status === 'in-progress' ? 'In Progress' : inq.status || 'new'}
                             </span>
                             <span className="px-2.5 py-0.5 rounded-full bg-[#FAF7F2] text-[#BD6024] border border-[#EFE8DC] text-[11px] font-semibold">
                               {inq.subject}
@@ -1765,12 +1996,55 @@ export default function Admin() {
                               {inq.email}
                             </a>
                             <span>•</span>
-                            <span>{formatInquiryDate(inq.createdAt)}</span>
+                            <span>Received {formatInquiryDate(inq.createdAt)}</span>
+                            {inq.updatedAt && (
+                              <>
+                                <span>•</span>
+                                <span className="text-[11px] text-[#82756A]">
+                                  Updated {formatInquiryDate(inq.updatedAt)}
+                                </span>
+                              </>
+                            )}
                           </div>
                         </div>
                       </div>
 
-                      <div className="shrink-0 flex items-center gap-2">
+                      <div className="shrink-0 flex flex-wrap items-center gap-2">
+                        {/* Status Management Dropdown */}
+                        <div className="flex items-center gap-1.5">
+                          <label
+                            htmlFor={`inquiry-status-${inq.id}`}
+                            className="text-[11px] font-semibold text-[#82756A] hidden sm:inline"
+                          >
+                            Status:
+                          </label>
+                          <select
+                            id={`inquiry-status-${inq.id}`}
+                            value={inq.status || 'new'}
+                            disabled={updatingInquiryId === inq.id}
+                            onChange={e =>
+                              handleUpdateInquiryStatus(
+                                inq.id,
+                                e.target.value as 'new' | 'in-progress' | 'resolved'
+                              )
+                            }
+                            className={`text-xs font-semibold rounded-xl px-2.5 py-1.5 border transition focus:outline-none focus:ring-2 focus:ring-[#BD6024] cursor-pointer disabled:opacity-50 ${
+                              (inq.status || 'new') === 'new'
+                                ? 'bg-blue-50 text-blue-800 border-blue-200'
+                                : (inq.status || 'new') === 'in-progress'
+                                ? 'bg-amber-50 text-amber-800 border-amber-200'
+                                : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                            }`}
+                          >
+                            <option value="new">New</option>
+                            <option value="in-progress">In Progress</option>
+                            <option value="resolved">Resolved</option>
+                          </select>
+                          {updatingInquiryId === inq.id && (
+                            <span className="w-3.5 h-3.5 rounded-full border-2 border-[#BD6024] border-t-transparent animate-spin inline-block" />
+                          )}
+                        </div>
+
                         <a
                           href={`mailto:${encodeURIComponent(inq.email)}?subject=${encodeURIComponent(
                             `Re: ${inq.subject} - Forma Living Concierge`

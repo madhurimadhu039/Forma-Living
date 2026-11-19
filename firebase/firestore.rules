@@ -14,7 +14,11 @@ service cloud.firestore {
     match /moodBoards/{id} { allow read, update, delete: if signedIn() && resource.data.uid == request.auth.uid; allow create: if signedIn() && request.resource.data.uid == request.auth.uid; }
     match /reviews/{id} { allow read: if true; allow create: if signedIn() && request.resource.data.uid == request.auth.uid; allow update, delete: if isAdmin(); }
     match /inquiries/{id} {
-      allow read, delete, update: if isAdmin();
+      allow read, delete: if isAdmin();
+      allow update: if isAdmin()
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt'])
+                    && request.resource.data.status in ['new', 'in-progress', 'resolved']
+                    && request.resource.data.updatedAt == request.time;
       allow create: if request.resource.data.keys().hasAll(['name', 'email', 'subject', 'message', 'status', 'createdAt', 'honeypot'])
                     && request.resource.data.keys().hasOnly(['name', 'email', 'subject', 'message', 'status', 'createdAt', 'honeypot'])
                     && request.resource.data.name is string
