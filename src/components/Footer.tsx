@@ -1,16 +1,102 @@
 import { useState, FormEvent } from 'react'
 import { Link } from 'react-router-dom'
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore'
+import { db } from '../config/firebase'
+
+const SUBSCRIBED_KEY = 'forma_newsletter_subscribers'
+
+const getSubscribedEmails = (): string[] => {
+  try {
+    const raw = localStorage.getItem(SUBSCRIBED_KEY)
+    return raw ? JSON.parse(raw) : []
+  } catch {
+    return []
+  }
+}
+
+const markEmailSubscribed = (email: string) => {
+  try {
+    const list = getSubscribedEmails()
+    if (!list.includes(email)) {
+      list.push(email)
+      localStorage.setItem(SUBSCRIBED_KEY, JSON.stringify(list))
+    }
+  } catch {}
+}
+
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
 export default function Footer() {
   const [newsletterEmail, setNewsletterEmail] = useState('')
-  const [newsletterSent, setNewsletterSent] = useState(false)
+  const [honeypot, setHoneypot] = useState('')
+  const [status, setStatus] = useState<
+    'idle' | 'loading' | 'success' | 'already-subscribed' | 'error'
+  >('idle')
+  const [errorMessage, setErrorMessage] = useState('')
 
-  const handleNewsletter = (e: FormEvent) => {
+  const handleNewsletter = async (e: FormEvent) => {
     e.preventDefault()
-    if (newsletterEmail.trim()) {
-      setNewsletterSent(true)
+    if (status === 'loading') return
+    setErrorMessage('')
+
+    // Anti-bot honeypot check: silently accept without writing to Firestore
+    if (honeypot && honeypot.trim() !== '') {
+      setStatus('success')
       setNewsletterEmail('')
-      setTimeout(() => setNewsletterSent(false), 4000)
+      setHoneypot('')
+      return
+    }
+
+    const trimmed = newsletterEmail.trim()
+    if (!trimmed) {
+      setStatus('error')
+      setErrorMessage('Please enter your email address.')
+      return
+    }
+
+    const normalizedEmail = trimmed.toLowerCase()
+
+    if (
+      normalizedEmail.length < 5 ||
+      normalizedEmail.length > 120 ||
+      !EMAIL_REGEX.test(normalizedEmail)
+    ) {
+      setStatus('error')
+      setErrorMessage('Please enter a valid email address (5–120 characters).')
+      return
+    }
+
+    // Check client-side deduplication cache first
+    if (getSubscribedEmails().includes(normalizedEmail)) {
+      setStatus('already-subscribed')
+      return
+    }
+
+    setStatus('loading')
+
+    try {
+      await setDoc(doc(db, 'subscribers', normalizedEmail), {
+        email: normalizedEmail,
+        status: 'subscribed',
+        createdAt: serverTimestamp(),
+      })
+
+      markEmailSubscribed(normalizedEmail)
+      setStatus('success')
+      setNewsletterEmail('')
+      setHoneypot('')
+    } catch (err: any) {
+      console.error('Newsletter subscription error:', err)
+      const code = err?.code || ''
+      if (getSubscribedEmails().includes(normalizedEmail)) {
+        setStatus('already-subscribed')
+      } else if (code === 'permission-denied') {
+        setStatus('error')
+        setErrorMessage('Unable to complete subscription at this time. Please try again later.')
+      } else {
+        setStatus('error')
+        setErrorMessage('Unable to subscribe at this moment. Please try again.')
+      }
     }
   }
 
@@ -158,27 +244,100 @@ export default function Footer() {
             <p className="text-xs text-[#A89E93] mb-3">
               Subscribe for design updates and exclusive new arrivals.
             </p>
-            {newsletterSent ? (
-              <div className="p-2.5 rounded-xl bg-[#29221C] border border-[#BD6024]/50 text-xs text-[#BD6024] font-medium">
-                ✓ Thank you! You’re on the Forma list.
+
+            {status === 'success' ? (
+              <div className="p-3 rounded-xl bg-[#29221C] border border-[#BD6024]/50 text-xs text-[#E89258] font-medium flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-[#BD6024] font-bold text-sm">✓</span>
+                  <span>Thank you! You’re on the Forma list.</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setStatus('idle')}
+                  className="text-[#A89E93] hover:text-white text-xs underline shrink-0"
+                >
+                  Done
+                </button>
+              </div>
+            ) : status === 'already-subscribed' ? (
+              <div className="p-3 rounded-xl bg-[#29221C] border border-amber-500/40 text-xs text-amber-200/90 font-medium flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-amber-400 font-bold text-sm">ⓘ</span>
+                  <span>This email is already subscribed.</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setStatus('idle')}
+                  className="text-[#A89E93] hover:text-white text-xs underline shrink-0"
+                >
+                  Close
+                </button>
               </div>
             ) : (
-              <form onSubmit={handleNewsletter} className="flex flex-col sm:flex-row gap-2 max-w-md">
-                <input
-                  type="email"
-                  required
-                  placeholder="Enter email address"
-                  value={newsletterEmail}
-                  onChange={e => setNewsletterEmail(e.target.value)}
-                  className="flex-1 bg-[#29221C] border border-[#3D332B] rounded-xl px-3 py-2 text-xs text-white placeholder-[#786E64] focus:outline-none focus:ring-2 focus:ring-[#BD6024]"
-                />
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-[#BD6024] hover:bg-[#a5511c] text-white rounded-xl text-xs font-semibold transition shrink-0"
-                >
-                  Join
-                </button>
-              </form>
+              <div>
+                {status === 'error' && errorMessage && (
+                  <div className="mb-2 p-2.5 rounded-xl bg-[#3B1E19] border border-rose-500/40 text-xs text-rose-200 flex items-center justify-between gap-2">
+                    <span>{errorMessage}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setStatus('idle')
+                        setErrorMessage('')
+                      }}
+                      className="text-rose-300 hover:text-white text-xs font-bold px-1"
+                      aria-label="Dismiss error"
+                    >
+                      ×
+                    </button>
+                  </div>
+                )}
+
+                <form onSubmit={handleNewsletter} className="flex flex-col sm:flex-row gap-2 max-w-md">
+                  {/* Anti-bot honeypot field */}
+                  <div className="hidden" aria-hidden="true" style={{ display: 'none' }}>
+                    <label htmlFor="footer-newsletter-hp">Do not fill this</label>
+                    <input
+                      id="footer-newsletter-hp"
+                      type="text"
+                      name="hp_company_field"
+                      value={honeypot}
+                      onChange={e => setHoneypot(e.target.value)}
+                      tabIndex={-1}
+                      autoComplete="off"
+                    />
+                  </div>
+
+                  <input
+                    type="email"
+                    required
+                    placeholder="Enter email address"
+                    value={newsletterEmail}
+                    onChange={e => {
+                      setNewsletterEmail(e.target.value)
+                      if (status === 'error') {
+                        setStatus('idle')
+                        setErrorMessage('')
+                      }
+                    }}
+                    disabled={status === 'loading'}
+                    className="flex-1 bg-[#29221C] border border-[#3D332B] rounded-xl px-3 py-2 text-xs text-white placeholder-[#786E64] focus:outline-none focus:ring-2 focus:ring-[#BD6024] disabled:opacity-60"
+                  />
+                  <button
+                    type="submit"
+                    disabled={status === 'loading'}
+                    className="px-4 py-2 bg-[#BD6024] hover:bg-[#a5511c] disabled:opacity-50 text-white rounded-xl text-xs font-semibold transition shrink-0 flex items-center justify-center gap-1.5 min-w-[70px]"
+                  >
+                    {status === 'loading' ? (
+                      <>
+                        <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                        <span>Joining…</span>
+                      </>
+                    ) : (
+                      'Join'
+                    )}
+                  </button>
+                </form>
+              </div>
             )}
           </div>
         </div>
