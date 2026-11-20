@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { User, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signOut, updateProfile } from 'firebase/auth'
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore'
 import { auth, db } from '../config/firebase'
 
 interface Ctx {
@@ -13,6 +13,8 @@ interface Ctx {
   logout: () => Promise<void>
   resendVerificationEmail: () => Promise<void>
   reloadUser: () => Promise<boolean>
+  updateUserProfile: (name: string) => Promise<void>
+  sendPasswordResetForUser: () => Promise<void>
 }
 
 export function formatAuthError(err: any): string {
@@ -134,6 +136,71 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           await currentUser.reload()
           setUser(cloneUser(auth.currentUser))
           return Boolean(auth.currentUser?.emailVerified)
+        },
+        updateUserProfile: async (name: string): Promise<void> => {
+          const currentUser = auth.currentUser
+          if (!currentUser) {
+            throw new Error('No user is currently signed in. Please sign in first.')
+          }
+
+          const trimmedName = name.trim()
+          if (trimmedName.length < 2 || trimmedName.length > 100) {
+            throw new Error('Full Name must be between 2 and 100 characters.')
+          }
+
+          // 1. Preserve the original Firebase Auth displayName
+          const originalDisplayName = currentUser.displayName ?? null
+
+          // 2. Update Firebase Auth displayName first
+          await updateProfile(currentUser, { displayName: trimmedName })
+
+          // 3. Then update or create users/{uid} in Firestore
+          try {
+            const userRef = doc(db, 'users', currentUser.uid)
+            const userSnap = await getDoc(userRef)
+
+            if (!userSnap.exists()) {
+              await setDoc(userRef, {
+                uid: currentUser.uid,
+                name: trimmedName,
+                email: currentUser.email || '',
+                createdAt: serverTimestamp(),
+              })
+            } else {
+              await updateDoc(userRef, {
+                name: trimmedName,
+                updatedAt: serverTimestamp(),
+              })
+            }
+
+            // Sync successful update to local state
+            setUser(cloneUser(currentUser))
+          } catch (firestoreErr: any) {
+            // 4. If the Firestore operation fails, restore original Firebase Auth displayName
+            try {
+              await updateProfile(currentUser, { displayName: originalDisplayName })
+              setUser(cloneUser(currentUser))
+            } catch (rollbackErr: any) {
+              // 5. If Auth rollback also fails, report both errors clearly
+              console.error('Failed to rollback Firebase Auth displayName:', rollbackErr)
+              const firestoreMsg = firestoreErr?.message || String(firestoreErr)
+              const rollbackMsg = rollbackErr?.message || String(rollbackErr)
+              const combinedError = new Error(
+                `Profile update failed in Firestore: ${firestoreMsg}. Additionally, rolling back authentication display name failed: ${rollbackMsg}`
+              )
+              ;(combinedError as any).cause = firestoreErr
+              ;(combinedError as any).rollbackError = rollbackErr
+              throw combinedError
+            }
+            throw firestoreErr
+          }
+        },
+        sendPasswordResetForUser: async (): Promise<void> => {
+          const currentUser = auth.currentUser
+          if (!currentUser || !currentUser.email) {
+            throw new Error('No signed-in user or email found to send reset instructions.')
+          }
+          await sendPasswordResetEmail(auth, currentUser.email)
         }
       }}
     >

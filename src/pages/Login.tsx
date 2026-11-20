@@ -5,7 +5,18 @@ import { useCart } from '../contexts/CartContext'
 import { useProducts } from '../contexts/ProductContext'
 
 export default function Login() {
-  const { user, isAdmin, login, register, reset, logout, resendVerificationEmail, reloadUser } = useAuth()
+  const {
+    user,
+    isAdmin,
+    login,
+    register,
+    reset,
+    logout,
+    resendVerificationEmail,
+    reloadUser,
+    updateUserProfile,
+    sendPasswordResetForUser
+  } = useAuth()
   const { lines, wishlist } = useCart()
   const { getProductById } = useProducts()
   const nav = useNavigate()
@@ -22,6 +33,22 @@ export default function Login() {
   const [resendLoading, setResendLoading] = useState(false)
   const [resendNotice, setResendNotice] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
   const [checkingVerification, setCheckingVerification] = useState(false)
+
+  // Profile Edit State
+  const [isEditingName, setIsEditingName] = useState(false)
+  const [profileName, setProfileName] = useState(user?.displayName || '')
+  const [profileSaving, setProfileSaving] = useState(false)
+  const [profileNotice, setProfileNotice] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+
+  // Password Reset State
+  const [resetSending, setResetSending] = useState(false)
+  const [resetNotice, setResetNotice] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+
+  useEffect(() => {
+    if (user?.displayName) {
+      setProfileName(user.displayName)
+    }
+  }, [user?.displayName])
 
   useEffect(() => {
     if (user && !user.emailVerified) {
@@ -139,7 +166,7 @@ export default function Login() {
           /* User Profile & Account Overview (When already logged in) */
           <div className="text-center py-2 sm:py-4">
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#FCEEE2] text-[#BD6024] font-bold flex items-center justify-center text-2xl border-2 border-[#BD6024]/20 shadow-xs">
-              {user.email?.charAt(0).toUpperCase() || 'U'}
+              {user.displayName?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || 'U'}
             </div>
             {/* Authentication and Verification Status Badges */}
             <div className="flex flex-wrap items-center justify-center gap-2 mb-2">
@@ -166,7 +193,7 @@ export default function Login() {
             </div>
 
             <h1 className="font-sans font-bold text-xl sm:text-2xl text-[#2B231D]">
-              Account Overview
+              {user.displayName ? `Welcome, ${user.displayName}` : 'Account Overview'}
             </h1>
             <p className="mt-1 text-xs sm:text-sm text-[#82756A] font-medium">
               {user.email}
@@ -250,6 +277,216 @@ export default function Login() {
                 )}
               </div>
             )}
+
+            {/* Customer Profile & Security Card */}
+            <div className="mt-5 p-4 rounded-2xl bg-[#FAF7F2] border border-[#EFE8DC] text-left">
+              <div className="flex items-center justify-between pb-3 border-b border-[#EFE8DC]">
+                <div>
+                  <h3 className="font-sans font-bold text-sm text-[#2B231D]">Customer Profile</h3>
+                  <p className="text-[11px] text-[#82756A]">Manage your display name and credentials</p>
+                </div>
+                {!isEditingName && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setProfileName(user.displayName || '')
+                      setProfileNotice(null)
+                      setIsEditingName(true)
+                    }}
+                    className="px-2.5 py-1 rounded-lg border border-[#E7DFD5] bg-white hover:bg-[#FCEEE2] hover:border-[#BD6024]/40 text-[#BD6024] font-semibold text-xs transition shadow-2xs flex items-center gap-1"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                    </svg>
+                    <span>Edit Name</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Profile Notice Feedback */}
+              {profileNotice && (
+                <div
+                  className={`mt-3 p-2.5 rounded-xl text-xs flex items-start gap-2 ${
+                    profileNotice.type === 'success'
+                      ? 'bg-emerald-50 border border-emerald-200 text-emerald-900'
+                      : 'bg-red-50 border border-red-200 text-red-900'
+                  }`}
+                >
+                  <span className="font-bold shrink-0 mt-0.5">
+                    {profileNotice.type === 'success' ? '✓' : '⚠️'}
+                  </span>
+                  <span className="leading-snug">{profileNotice.message}</span>
+                </div>
+              )}
+
+              {isEditingName ? (
+                <form
+                  onSubmit={async e => {
+                    e.preventDefault()
+                    const trimmed = profileName.trim()
+                    if (trimmed.length < 2 || trimmed.length > 100) {
+                      setProfileNotice({
+                        type: 'error',
+                        message: 'Full Name must be between 2 and 100 characters.',
+                      })
+                      return
+                    }
+
+                    setProfileSaving(true)
+                    setProfileNotice(null)
+
+                    try {
+                      await updateUserProfile(trimmed)
+                      setProfileNotice({
+                        type: 'success',
+                        message: 'Your profile name has been updated successfully.',
+                      })
+                      setIsEditingName(false)
+                    } catch (err: any) {
+                      setProfileNotice({
+                        type: 'error',
+                        message: err?.message || 'Failed to update profile name. Please try again.',
+                      })
+                    } finally {
+                      setProfileSaving(false)
+                    }
+                  }}
+                  className="mt-3 space-y-3"
+                >
+                  <div>
+                    <label htmlFor="account-full-name" className="block text-xs font-semibold text-[#2B231D] mb-1">
+                      Full Name
+                    </label>
+                    <input
+                      id="account-full-name"
+                      type="text"
+                      required
+                      minLength={2}
+                      maxLength={100}
+                      value={profileName}
+                      onChange={e => setProfileName(e.target.value)}
+                      placeholder="e.g. Eleanor Vance"
+                      disabled={profileSaving}
+                      className="w-full px-3 py-2 rounded-xl border border-[#EFE8DC] bg-white text-xs sm:text-sm text-[#2B231D] focus:outline-none focus:border-[#BD6024] focus:ring-1 focus:ring-[#BD6024]"
+                    />
+                    <div className="flex justify-between text-[11px] text-[#82756A] mt-1">
+                      <span>2–100 characters</span>
+                      <span>{profileName.trim().length}/100</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-1">
+                    <button
+                      type="submit"
+                      disabled={profileSaving}
+                      className="px-3.5 py-1.5 rounded-lg bg-[#BD6024] hover:bg-[#a5511c] disabled:opacity-50 text-white font-semibold text-xs transition shadow-2xs flex items-center gap-1.5"
+                    >
+                      {profileSaving ? (
+                        <>
+                          <svg className="animate-spin -ml-0.5 h-3 w-3 text-white" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                          </svg>
+                          <span>Saving…</span>
+                        </>
+                      ) : (
+                        'Save Changes'
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={profileSaving}
+                      onClick={() => {
+                        setProfileName(user.displayName || '')
+                        setProfileNotice(null)
+                        setIsEditingName(false)
+                      }}
+                      className="px-3 py-1.5 rounded-lg border border-[#E7DFD5] bg-white hover:bg-[#FAF7F2] text-[#6E6359] font-medium text-xs transition"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div className="mt-3 space-y-2 text-xs">
+                  <div className="flex items-center justify-between py-1">
+                    <span className="text-[#82756A]">Full Name</span>
+                    <span className="font-semibold text-[#2B231D]">{user.displayName || 'Not set'}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-1 border-t border-[#EFE8DC]/60">
+                    <span className="text-[#82756A]">Email Address</span>
+                    <span className="font-semibold text-[#2B231D] truncate max-w-[180px] sm:max-w-none">{user.email}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Password Reset Action */}
+              <div className="mt-4 pt-3 border-t border-[#EFE8DC]">
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <p className="font-semibold text-xs text-[#2B231D]">Account Security</p>
+                    <p className="text-[11px] text-[#82756A]">Need to change your login credentials?</p>
+                  </div>
+                  <button
+                    type="button"
+                    disabled={resetSending}
+                    onClick={async () => {
+                      setResetSending(true)
+                      setResetNotice(null)
+                      try {
+                        await sendPasswordResetForUser()
+                        setResetNotice({
+                          type: 'success',
+                          message: `Password reset link sent to ${user.email}. Check your inbox or spam folder.`,
+                        })
+                      } catch (err: any) {
+                        setResetNotice({
+                          type: 'error',
+                          message: err?.message || 'Failed to send password reset email. Please try again later.',
+                        })
+                      } finally {
+                        setResetSending(false)
+                      }
+                    }}
+                    className="px-2.5 py-1 rounded-lg border border-[#E7DFD5] bg-white hover:bg-[#FCEEE2] hover:border-[#BD6024]/40 text-[#2B231D] hover:text-[#BD6024] font-semibold text-xs transition shadow-2xs flex items-center gap-1.5 shrink-0"
+                  >
+                    {resetSending ? (
+                      <>
+                        <svg className="animate-spin -ml-0.5 h-3 w-3 text-[#BD6024]" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                        </svg>
+                        <span>Sending…</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 text-[#BD6024]">
+                          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                        <span>Reset Password</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {resetNotice && (
+                  <div
+                    className={`mt-2.5 p-2.5 rounded-xl text-xs flex items-start gap-2 ${
+                      resetNotice.type === 'success'
+                        ? 'bg-emerald-50 border border-emerald-200 text-emerald-900'
+                        : 'bg-red-50 border border-red-200 text-red-900'
+                    }`}
+                  >
+                    <span className="font-bold shrink-0 mt-0.5">
+                      {resetNotice.type === 'success' ? '✓' : '⚠️'}
+                    </span>
+                    <span className="leading-snug">{resetNotice.message}</span>
+                  </div>
+                )}
+              </div>
+            </div>
 
             <div className="grid grid-cols-2 gap-3 my-6 text-xs">
               <Link
