@@ -5,6 +5,7 @@ import { useCart } from '../contexts/CartContext'
 import { useProducts } from '../contexts/ProductContext'
 import RouteLoading from './RouteLoading'
 import Footer from './Footer'
+import { applySeo, SeoConfig } from '../utils/seo'
 
 export function Layout() {
   const { user, logout } = useAuth()
@@ -18,31 +19,90 @@ export function Layout() {
   const totalCartCount = lines.reduce((s, l) => s + l.qty, 0)
   const totalWishCount = wishlist.filter(id => Boolean(getProductById(id))).length
 
-  // Synchronize document title based on route navigation
+  // Synchronize document title and SEO metadata based on route navigation
   useEffect(() => {
-    // Dynamic product detail routes manage their own titles based on loaded data
+    // Dynamic product detail routes manage their own SEO metadata based on loaded data
     if (location.pathname.startsWith('/product/')) {
       return
     }
 
-    const staticTitles: Record<string, string> = {
-      '/': 'Forma Living — Modern Furniture & Curated Decor',
-      '/shop': 'Shop Furniture & Decor | Forma Living',
-      '/cart': 'Your Shopping Cart | Forma Living',
-      '/wishlist': 'Your Wishlist | Forma Living',
-      '/about': 'About Us & Our Craft | Forma Living',
-      '/contact': 'Design Concierge & Support | Forma Living',
-      '/login': 'Sign In | Forma Living',
-      '/privacy': 'Privacy Policy | Forma Living',
-      '/terms': 'Terms & Conditions | Forma Living',
-      '/admin': 'Admin Dashboard | Forma Living',
+    const staticSeo: Record<string, SeoConfig> = {
+      '/': {
+        title: 'Forma Living — Modern Furniture & Curated Decor',
+        description:
+          'Thoughtfully designed modern furniture & decor crafted for beautiful, happier spaces. Explore our curated living, bedroom, dining, and outdoor collections.',
+        canonicalPath: '/',
+      },
+      '/shop': {
+        title: 'Shop Furniture & Decor | Forma Living',
+        description:
+          'Browse the complete Forma Living catalog. Discover artisanal sofas, sculptural dining tables, solid timber storage, and designer lighting.',
+        canonicalPath: '/shop',
+      },
+      '/cart': {
+        title: 'Your Shopping Cart | Forma Living',
+        description:
+          'Review your selected furniture pieces and manage your shopping cart with ease.',
+        canonicalPath: '/cart',
+        noIndex: true,
+      },
+      '/wishlist': {
+        title: 'Your Wishlist | Forma Living',
+        description:
+          'Curate your personal design board. Save your favorite modern furniture pieces and room accents.',
+        canonicalPath: '/wishlist',
+        noIndex: true,
+      },
+      '/about': {
+        title: 'About Us & Our Craft | Forma Living',
+        description:
+          'Learn about Forma Living’s design ethos, sustainable materials, and dedication to heirloom-quality modern furniture.',
+        canonicalPath: '/about',
+      },
+      '/contact': {
+        title: 'Design Concierge & Support | Forma Living',
+        description:
+          'Connect with our design concierge team for personalized room advice, custom dimensions, trade partnerships, and order support.',
+        canonicalPath: '/contact',
+      },
+      '/login': {
+        title: 'Sign In | Forma Living',
+        description:
+          'Sign in to manage your Forma Living profile and saved wishlist.',
+        canonicalPath: '/login',
+        noIndex: true,
+      },
+      '/privacy': {
+        title: 'Privacy Policy | Forma Living',
+        description:
+          'Review how Forma Living protects your privacy and personal data across our online furniture boutique.',
+        canonicalPath: '/privacy',
+      },
+      '/terms': {
+        title: 'Terms & Conditions | Forma Living',
+        description:
+          'Read the terms, policies, warranties, and delivery standards for purchasing from Forma Living.',
+        canonicalPath: '/terms',
+      },
+      '/admin': {
+        title: 'Admin Dashboard | Forma Living',
+        description:
+          'Forma Living administrative workspace for inventory management and customer inquiries.',
+        canonicalPath: '/admin',
+        noIndex: true,
+      },
     }
 
-    const title = staticTitles[location.pathname]
-    if (title) {
-      document.title = title
+    const seo = staticSeo[location.pathname]
+    if (seo) {
+      applySeo(seo)
     } else {
-      document.title = 'Page Not Found (404) | Forma Living'
+      applySeo({
+        title: 'Page Not Found (404) | Forma Living',
+        description:
+          'The requested page or collection does not exist or has found a new home. Explore our catalog to discover curated modern furniture.',
+        noIndex: true,
+      })
     }
   }, [location.pathname])
 

@@ -6,6 +6,7 @@ import { ProductCard } from './Shop'
 import { formatPrice } from '../utils/format'
 import { normalizeProductImages } from '../services/adminProducts'
 import ProductReviews from '../components/ProductReviews'
+import { applySeo } from '../utils/seo'
 
 export default function ProductPage() {
   const { id } = useParams()
@@ -32,16 +33,36 @@ export default function ProductPage() {
     setSelectedImage(gallery[0] || '')
   }, [p?.id, rawGalleryKey])
 
-  // Dynamic document title based on loaded piece data
+  // Dynamic SEO metadata based on loaded piece data
   useEffect(() => {
     if (p?.name) {
-      document.title = `${p.name} | Forma Living`
+      const trimmedDesc = p.description
+        ? p.description.length > 160
+          ? `${p.description.slice(0, 157).trim()}…`
+          : p.description
+        : `${p.name}: crafted from premium ${p.material} in a refined ${p.style} aesthetic.`
+
+      applySeo({
+        title: `${p.name} | Forma Living`,
+        description: trimmedDesc,
+        canonicalPath: `/product/${p.id}`,
+        ogType: 'product',
+        ogImage: p.image,
+      })
     } else if (loading) {
-      document.title = 'Loading Piece… | Forma Living'
+      applySeo({
+        title: 'Loading Piece… | Forma Living',
+        description: 'Loading furniture piece details from the Forma Living catalog.',
+        noIndex: true,
+      })
     } else {
-      document.title = 'Product Not Found | Forma Living'
+      applySeo({
+        title: 'Product Not Found | Forma Living',
+        description: 'The furniture item you are looking for does not exist or has been moved.',
+        noIndex: true,
+      })
     }
-  }, [p?.name, loading])
+  }, [p, loading])
 
   if (!p) {
     if (loading) {

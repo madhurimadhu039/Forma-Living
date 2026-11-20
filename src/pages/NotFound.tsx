@@ -1,9 +1,15 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { applySeo } from '../utils/seo'
 
 export default function NotFound() {
   useEffect(() => {
-    document.title = 'Page Not Found (404) | Forma Living'
+    applySeo({
+      title: 'Page Not Found (404) | Forma Living',
+      description:
+        'The piece, collection, or room you’re looking for doesn’t exist or has found a new home in our catalog.',
+      noIndex: true,
+    })
   }, [])
   return (
     <div className="mx-auto max-w-4xl px-4 sm:px-6 py-16 sm:py-28 flex flex-col items-center justify-center text-center">

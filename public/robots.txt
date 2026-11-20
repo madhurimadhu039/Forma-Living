@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /cart
+Disallow: /wishlist
+Disallow: /login
+
+Sitemap: https://forma-living-ten.vercel.app/sitemap.xml
