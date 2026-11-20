@@ -367,7 +367,7 @@ export default function ProductReviews({
                     {userExistingReview.comment}
                   </p>
                   <p className="mt-4 text-[11px] text-[#A89C90] italic border-t border-[#F2ECE4] pt-2">
-                    Forma Living allows one verified review per member per design.
+                    Forma Living allows one review per member per product.
                   </p>
                 </div>
               ) : !user ? (
