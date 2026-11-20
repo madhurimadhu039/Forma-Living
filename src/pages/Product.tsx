@@ -5,6 +5,7 @@ import { useCart } from '../contexts/CartContext'
 import { ProductCard } from './Shop'
 import { formatPrice } from '../utils/format'
 import { normalizeProductImages } from '../services/adminProducts'
+import ProductReviews from '../components/ProductReviews'
 
 export default function ProductPage() {
   const { id } = useParams()
@@ -12,6 +13,10 @@ export default function ProductPage() {
   const p = getProductById(id || '')
   const { add, toggleWish, wishlist } = useCart()
   const [addedNote, setAddedNote] = useState(false)
+  const [reviewSummary, setReviewSummary] = useState<{ average: number | null; count: number }>({
+    average: null,
+    count: 0
+  })
   const rawGalleryKey = p
     ? `${p.image}::${Array.isArray(p.images) ? p.images.join('|') : ''}`
     : ''
@@ -141,6 +146,49 @@ export default function ProductPage() {
             {p.name}
           </h1>
 
+          {/* Star Rating Summary */}
+          <button
+            type="button"
+            onClick={() => {
+              document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth' })
+            }}
+            className="mt-2 inline-flex items-center gap-2 group text-left cursor-pointer focus:outline-none"
+            aria-label={`Jump to reviews. ${reviewSummary.average !== null ? `${reviewSummary.average} out of 5 stars based on ${reviewSummary.count} reviews` : 'No reviews yet'}`}
+          >
+            <div className="flex items-center text-amber-500">
+              {[1, 2, 3, 4, 5].map(star => (
+                <svg
+                  key={star}
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  className={`w-4 h-4 ${
+                    reviewSummary.average !== null && star <= Math.round(reviewSummary.average)
+                      ? 'text-amber-500'
+                      : 'text-[#E0D7CD]'
+                  }`}
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              ))}
+            </div>
+            <span className="text-xs sm:text-sm font-medium text-[#6E6359] group-hover:text-[#BD6024] transition-colors">
+              {reviewSummary.average !== null ? (
+                <>
+                  <span className="font-semibold text-[#2B231D]">{reviewSummary.average.toFixed(1)}</span>
+                  <span className="text-[#82756A] ml-1">
+                    ({reviewSummary.count} {reviewSummary.count === 1 ? 'review' : 'reviews'})
+                  </span>
+                </>
+              ) : (
+                <span className="text-[#82756A] group-hover:underline">No reviews yet • Leave a review</span>
+              )}
+            </span>
+          </button>
+
           {/* Price */}
           <div className="mt-3 sm:mt-4 flex items-center gap-3">
             <span className="text-2xl sm:text-3xl font-bold text-[#BD6024]">{formatPrice(p.price)}</span>
@@ -220,6 +268,15 @@ export default function ProductPage() {
             </dl>
           </div>
         </div>
+      </div>
+
+      {/* Customer Product Reviews & Star Ratings */}
+      <div id="reviews" className="scroll-mt-10">
+        <ProductReviews
+          productId={p.id}
+          productName={p.name}
+          onSummaryChange={setReviewSummary}
+        />
       </div>
 
       {/* Related Products */}
