@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useCart } from '../contexts/CartContext'
 import { useProducts } from '../contexts/ProductContext'
 import RouteLoading from './RouteLoading'
+import Footer from './Footer'
 
 export function Layout() {
   const { user, logout } = useAuth()
@@ -220,6 +221,9 @@ export function Layout() {
           <Outlet />
         </Suspense>
       </main>
+
+      {/* Global Footer (Visible across all public pages; suppressed on Admin dashboard) */}
+      {!location.pathname.startsWith('/admin') && <Footer />}
 
       {/* Mobile Sticky Bottom Navigation Bar (Visible only on mobile screens < 768px, with iOS safe-area inset) */}
       <nav

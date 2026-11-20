@@ -11,6 +11,7 @@ const Login = lazy(() => import('./pages/Login'))
 const About = lazy(() => import('./pages/About'))
 const Contact = lazy(() => import('./pages/Contact'))
 const Admin = lazy(() => import('./pages/Admin'))
+const NotFound = lazy(() => import('./pages/NotFound'))
 
 const Privacy = () => (
   <div className="mx-auto max-w-4xl px-4 py-16">
@@ -45,6 +46,7 @@ export default function App() {
         <Route path="privacy" element={<Privacy />} />
         <Route path="terms" element={<Terms />} />
         <Route path="admin" element={<Protected admin><Admin /></Protected>} />
+        <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
   )
