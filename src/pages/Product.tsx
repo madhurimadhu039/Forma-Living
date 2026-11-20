@@ -32,6 +32,17 @@ export default function ProductPage() {
     setSelectedImage(gallery[0] || '')
   }, [p?.id, rawGalleryKey])
 
+  // Dynamic document title based on loaded piece data
+  useEffect(() => {
+    if (p?.name) {
+      document.title = `${p.name} | Forma Living`
+    } else if (loading) {
+      document.title = 'Loading Piece… | Forma Living'
+    } else {
+      document.title = 'Product Not Found | Forma Living'
+    }
+  }, [p?.name, loading])
+
   if (!p) {
     if (loading) {
       return (

@@ -1,4 +1,4 @@
-import { useState, Suspense } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { Link, Outlet, Navigate, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useCart } from '../contexts/CartContext'
@@ -17,6 +17,34 @@ export function Layout() {
 
   const totalCartCount = lines.reduce((s, l) => s + l.qty, 0)
   const totalWishCount = wishlist.filter(id => Boolean(getProductById(id))).length
+
+  // Synchronize document title based on route navigation
+  useEffect(() => {
+    // Dynamic product detail routes manage their own titles based on loaded data
+    if (location.pathname.startsWith('/product/')) {
+      return
+    }
+
+    const staticTitles: Record<string, string> = {
+      '/': 'Forma Living — Modern Furniture & Curated Decor',
+      '/shop': 'Shop Furniture & Decor | Forma Living',
+      '/cart': 'Your Shopping Cart | Forma Living',
+      '/wishlist': 'Your Wishlist | Forma Living',
+      '/about': 'About Us & Our Craft | Forma Living',
+      '/contact': 'Design Concierge & Support | Forma Living',
+      '/login': 'Sign In | Forma Living',
+      '/privacy': 'Privacy Policy | Forma Living',
+      '/terms': 'Terms & Conditions | Forma Living',
+      '/admin': 'Admin Dashboard | Forma Living',
+    }
+
+    const title = staticTitles[location.pathname]
+    if (title) {
+      document.title = title
+    } else {
+      document.title = 'Page Not Found (404) | Forma Living'
+    }
+  }, [location.pathname])
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault()
